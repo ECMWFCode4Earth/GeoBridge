@@ -30,7 +30,7 @@ The library is the foundation for the project's QGIS plugin.
   server-side parameter form for any dataset so your UI can build validated
   request widgets. `gb.valid_variables_for_product_type()` filters the variable
   list to what the selected product type actually supports.
-- **Styling.** `gb.to_qgis_style()` and `gb.to_esri_lyrx()` generate
+- **Styling.** `gb.to_qgis_style()` generate
   calibrated colour ramps for known Copernicus variables.
 - **Fusion.** `gb.fuse()` co-registers multiple layers onto a common grid
   for joint analysis (e.g. heat + air quality).
@@ -161,7 +161,7 @@ geobridge/                              ← repository root
 │   │   ├── cds_download.py             ← CDS API → GeoTIFF (non-ARCO datasets)
 │   │   ├── wmts.py                     ← WMTS layer
 │   │   ├── form.py                     ← dataset form schema & constraints
-│   │   ├── style.py                    ← QGIS QML and ESRI LYRx export
+│   │   ├── style.py                    ← QGIS QML export
 │   │   └── fuse.py                     ← multi-layer co-registration
 │   └── semantic/
 │       ├── engine.py                   ← rule-based query resolver
