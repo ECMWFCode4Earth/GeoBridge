@@ -1,0 +1,67 @@
+# GeoBridge — variable name aliases
+# =================================
+# Maps CDS long-form variable names (used in cdsapi documentation and the
+# CDS download form) to ARCO short-form variable names (used inside the
+# Zarr stores).
+#
+# Why this file exists
+# --------------------
+# The ARCO STAC catalogue at arco.datastores.ecmwf.int publishes everything
+# else — Zarr URLs, variable lists, units, value ranges, coordinate
+# extents, optional WMTS endpoints — directly in machine-readable form.
+# That information is captured automatically by
+# scripts/refresh_arco_catalogue.py into arco_snapshot.yaml.
+#
+# But the CDS website and cdsapi documentation use long descriptive names
+# like "2m_temperature" while the ARCO Zarr stores use short GRIB names
+# like "t2m".  There is no published authoritative mapping between the
+# two, so this small alias file is hand-maintained.
+#
+# Users of GeoBridge can pass either form to zarr_to_geotiff() — the
+# library translates transparently.
+#
+# Schema
+# ------
+# Top-level "variable_aliases" applies to every dataset.
+# Per-dataset overrides may live under "<dataset_id>: variable_aliases:"
+# to handle dataset-specific exceptions.
+#
+# Last updated: 2026-05-20
+
+overrides:
+
+  variable_aliases:
+    # --- ERA5 single levels ------------------------------------------------
+    "2m_temperature":                              "t2m"
+    "2m_dewpoint_temperature":                     "d2m"
+    "mean_sea_level_pressure":                     "msl"
+    "surface_pressure":                            "sp"
+    "total_precipitation":                         "tp"
+    "total_cloud_cover":                           "tcc"
+    "sea_surface_temperature":                     "sst"
+    "skin_temperature":                            "skt"
+    "boundary_layer_height":                       "blh"
+    "cloud_base_height":                           "cbh"
+    "total_sky_direct_solar_radiation_at_surface": "fdir"
+    "10m_wind_gust_since_previous_post_processing": "fg10"
+    "surface_solar_radiation_downwards":           "ssrd"
+    "surface_thermal_radiation_downwards":         "strd"
+    "10m_u_component_of_wind":                     "u10"
+    "10m_v_component_of_wind":                     "v10"
+    "100m_u_component_of_wind":                    "u100"
+    "100m_v_component_of_wind":                    "v100"
+
+    # --- ERA5 wave subset --------------------------------------------------
+    "significant_height_of_wind_waves":            "swh"
+
+    # --- UTCI thermal comfort ----------------------------------------------
+    "universal_thermal_climate_index":             "utci"
+    "mean_radiant_temperature":                    "mrt"
+
+    # --- CAMS European air quality reanalyses ------------------------------
+    "nitrogen_dioxide":                            "no2"
+    "ozone":                                       "o3"
+    "particulate_matter_2.5um":                    "pm2p5"
+    "particulate_matter_10um":                     "pm10"
+    "sulphur_dioxide":                             "so2"
+    "carbon_monoxide":                             "co"
