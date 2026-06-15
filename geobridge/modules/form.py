@@ -138,32 +138,64 @@ def _fetch_json(url: str, timeout: int = 20) -> Any:
         return json.loads(resp.read())
 
 
+_CATALOGUE_API = "https://cds.climate.copernicus.eu/api/catalogue/v1/collections"
+
+
 def _get_form_url(dataset_id: str) -> Optional[str]:
-    """Look up the form URL from the CDS snapshot."""
+    """Look up the form URL, first from the local snapshot then live from CDS."""
+    cds_id = dataset_id.replace("_", "-")
+
+    # 1. Local snapshot (fast, no network)
     try:
         from geobridge.modules.discover import _load_cds_snapshot
         snapshot = _load_cds_snapshot()
-        # CDS snapshot uses hyphenated ids
-        cds_id = dataset_id.replace("_", "-")
         entry = snapshot.get(cds_id) or snapshot.get(dataset_id)
         if entry:
-            return (entry.get("links") or {}).get("form")
+            url = (entry.get("links") or {}).get("form")
+            if url:
+                return url
     except Exception:
         pass
+
+    # 2. Live CDS catalogue API fallback (dataset not in bundled snapshot)
+    try:
+        collection_url = f"{_CATALOGUE_API}/{cds_id}"
+        data = _fetch_json(collection_url, timeout=15)
+        for link in data.get("links", []):
+            if link.get("rel") == "form" or "form.json" in link.get("href", ""):
+                return link["href"]
+    except Exception as exc:
+        logger.debug("Live form URL lookup failed for %s: %s", cds_id, exc)
+
     return None
 
 
 def _get_constraints_url(dataset_id: str) -> Optional[str]:
-    """Look up the constraints URL from the CDS snapshot."""
+    """Look up the constraints URL, first from the local snapshot then live from CDS."""
+    cds_id = dataset_id.replace("_", "-")
+
+    # 1. Local snapshot
     try:
         from geobridge.modules.discover import _load_cds_snapshot
         snapshot = _load_cds_snapshot()
-        cds_id = dataset_id.replace("_", "-")
         entry = snapshot.get(cds_id) or snapshot.get(dataset_id)
         if entry:
-            return (entry.get("links") or {}).get("constraints")
+            url = (entry.get("links") or {}).get("constraints")
+            if url:
+                return url
     except Exception:
         pass
+
+    # 2. Live CDS catalogue API fallback
+    try:
+        collection_url = f"{_CATALOGUE_API}/{cds_id}"
+        data = _fetch_json(collection_url, timeout=15)
+        for link in data.get("links", []):
+            if link.get("rel") == "constraints" or "constraints.json" in link.get("href", ""):
+                return link["href"]
+    except Exception as exc:
+        logger.debug("Live constraints URL lookup failed for %s: %s", cds_id, exc)
+
     return None
 
 

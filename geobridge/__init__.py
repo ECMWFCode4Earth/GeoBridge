@@ -60,7 +60,6 @@ from geobridge.modules.extract import (
 )
 from geobridge.modules.style import (
     to_qgis_style,
-    to_esri_lyrx,
 )
 from geobridge.modules.fuse import (
     fuse,
@@ -116,7 +115,6 @@ __all__ = [
     "FormSchema",
     # Styling
     "to_qgis_style",
-    "to_esri_lyrx",
     # Fusion
     "fuse",
     "FusedLayer",

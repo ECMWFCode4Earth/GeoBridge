@@ -129,6 +129,21 @@ def _submit_job(dataset_id: str, request: dict) -> str:
         resp = _post_json(url, payload)
     except urllib.error.HTTPError as exc:
         body = exc.read().decode(errors="replace")
+        if exc.code == 401:
+            dataset_page = (
+                f"https://cds.climate.copernicus.eu/datasets/{cds_id}"
+            )
+            raise CdsApiError(
+                f"CDS API rejected the request for '{cds_id}' (HTTP 401 — permission denied).\n\n"
+                "Most likely cause: you need to accept the dataset's licence on the CDS portal.\n\n"
+                f"  1. Open: {dataset_page}\n"
+                "  2. Scroll to the bottom and click 'Accept Terms'\n"
+                "  3. Re-run this script\n\n"
+                "If you have already accepted the licence, verify that your API key\n"
+                "in ~/.cdsapirc matches the one shown at:\n"
+                "  https://cds.climate.copernicus.eu/profile\n\n"
+                f"Raw response:\n{body}"
+            ) from exc
         raise CdsApiError(
             f"CDS API rejected the request for '{cds_id}' "
             f"(HTTP {exc.code}):\n{body}\n\n"

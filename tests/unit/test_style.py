@@ -1,6 +1,5 @@
-"""Tests for geobridge.modules.style — QGIS QML and ESRI LYRx generation."""
+"""Tests for geobridge.modules.style — QGIS QML generation."""
 
-import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -95,20 +94,3 @@ def test_to_qgis_style_default_filename(tmp_path, monkeypatch):
     assert result.exists()
 
 
-def test_to_esri_lyrx_writes_valid_json(tmp_path):
-    out = tmp_path / "temp.lyrx"
-    result = style.to_esri_lyrx("2m_temperature", output_path=out)
-    assert result.exists()
-
-    content = out.read_text(encoding="utf-8")
-    parsed = json.loads(content)
-    assert parsed["type"] == "CIMLayerDocument"
-    assert "layers" in parsed
-    assert len(parsed["layers"]) == 1
-
-
-def test_to_esri_lyrx_anomaly_works(tmp_path):
-    out = tmp_path / "anom.lyrx"
-    style.to_esri_lyrx("utci", style_type="anomaly", output_path=out)
-    content = json.loads(out.read_text(encoding="utf-8"))
-    assert "layers" in content
