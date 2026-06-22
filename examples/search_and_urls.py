@@ -12,7 +12,6 @@ What it does (one module per step):
     3. modules.form      — fetch the CDS form schema (available variables,
                            product types, date ranges) from the live CDS API
     4. modules.wmts      — construct WMTS GetTile / GetCapabilities URLs
-    5. modules.style     — show which QGIS / ESRI style preset would be used
 """
 
 from __future__ import annotations
@@ -260,18 +259,6 @@ def main(query: str) -> None:
         print( "            )")
     else:
         print("    CDS retrieve URL not available for this dataset.")
-
-    # ------------------------------------------------------------------
-    # Step 5 — style.py: show which style preset applies
-    # ------------------------------------------------------------------
-    print(f"\n{_SEP2}")
-    _print_section("6 · style presets  (modules/style.py)")
-
-    print(f"\n    Colormap hint from LayerDescriptor:  {ds.colormap}")
-    print(f"\n    to_qgis_style() / to_esri_lyrx() accept:")
-    _print_kv("dataset", dataset_id)
-    _print_kv("variable", variable)
-    print("    (call with output_path= to write a .qml or .lyrx file)")
 
     print(f"\n{_SEP}\n")
 

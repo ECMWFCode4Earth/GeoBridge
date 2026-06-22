@@ -264,6 +264,7 @@ themes:
       - runoff
       - flash flood
       - inundation
+      - precipitation
     description: >
       Precipitation and hydrological products from ERA5 and satellite
       precipitation datasets relevant to flood hazard and exposure

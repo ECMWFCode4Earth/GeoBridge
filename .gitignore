@@ -19,3 +19,6 @@ build/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# folders
+examples/

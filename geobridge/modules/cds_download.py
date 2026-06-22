@@ -71,7 +71,7 @@ CDS_API_BASE = "https://cds.climate.copernicus.eu/api/retrieve/v1"
 # Polling strategy: start at 5s, double up to 60s max
 _POLL_INITIAL = 5.0
 _POLL_MAX = 60.0
-_POLL_BACKOFF = 2.0
+_POLL_BACKOFF = 15.0
 
 
 class CdsApiError(Exception):
@@ -388,6 +388,18 @@ def cds_to_geotiff(
             variable = vars_in_request[0]
         elif isinstance(vars_in_request, str):
             variable = vars_in_request
+
+    # Validate before submitting to catch errors without burning queue time
+    try:
+        from geobridge.modules.form import validate_request
+        errors = validate_request(dataset, request)
+        if errors:
+            raise CdsApiError(
+                f"Invalid request for '{dataset}':\n"
+                + "\n".join(f"  • {e}" for e in errors)
+            )
+    except ImportError:
+        pass
 
     if progress_callback:
         progress_callback(f"Submitting CDS request for {dataset}…")

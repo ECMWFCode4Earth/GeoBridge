@@ -366,6 +366,98 @@ def valid_variables_for_product_type(
     return sorted(result)
 
 
+def validate_request(dataset_id: str, request: dict) -> list[str]:
+    """Validate a CDS request dict against the form schema and constraints.
+
+    Checks two things:
+
+    1. **Allowed values** — every value in the request must appear in the
+       form's enum for that parameter (uses :func:`fetch_form`).
+    2. **Valid combinations** — the combination of values must match at
+       least one entry in the constraints JSON (uses :func:`fetch_constraints`).
+       Skipped if no constraints URL is available for the dataset.
+
+    Parameters
+    ----------
+    dataset_id : str
+        CDS dataset identifier.
+    request : dict
+        CDS API request parameters (same dict passed to ``cds_to_geotiff``).
+
+    Returns
+    -------
+    list[str]
+        List of human-readable error strings.  Empty list means the request
+        looks valid.
+
+    Examples
+    --------
+    >>> from geobridge.modules.form import validate_request
+    >>> errors = validate_request("derived-utci-historical", {
+    ...     "product_type": ["consolidated_dataset"],
+    ...     "variable": ["universal_thermal_climate_index"],
+    ...     "year": ["2025"], "month": ["01"], "day": ["01"],
+    ...     "data_format": "grib",
+    ... })
+    >>> if errors:
+    ...     for e in errors: print(e)
+    """
+    errors: list[str] = []
+
+    # --- 1. Allowed-values check via form schema ---
+    schema = fetch_form(dataset_id)
+    if schema:
+        for param, val in request.items():
+            if param == "data_format":
+                continue
+            widget = schema.get_widget(param)
+            if widget is None or not widget.value_list:
+                continue  # unknown / free-form parameter — skip
+            allowed = set(widget.value_list)
+            submitted = [val] if isinstance(val, str) else list(val)
+            bad = [v for v in submitted if v not in allowed]
+            if bad:
+                errors.append(
+                    f"'{param}': invalid value(s) {bad}. "
+                    f"Allowed: {sorted(allowed)}"
+                )
+    else:
+        logger.warning(
+            "Form schema not available for %s — skipping allowed-values check.",
+            dataset_id,
+        )
+
+    # --- 2. Combination check via constraints JSON ---
+    constraints = fetch_constraints(dataset_id)
+    if constraints:
+        # Normalise request values to sets of strings for comparison
+        req_sets: dict[str, set[str]] = {}
+        for param, val in request.items():
+            if param == "data_format":
+                continue
+            req_sets[param] = (
+                {val} if isinstance(val, str) else set(val)
+            )
+
+        def _combo_matches(combo: dict) -> bool:
+            for param, allowed_vals in combo.items():
+                if param not in req_sets:
+                    continue
+                if not req_sets[param].intersection(allowed_vals):
+                    return False
+            return True
+
+        if not any(_combo_matches(c) for c in constraints):
+            errors.append(
+                "The parameter combination is not valid for this dataset. "
+                "Check the CDS portal for allowed combinations: "
+                f"https://cds.climate.copernicus.eu/datasets/"
+                f"{dataset_id.replace('_', '-')}"
+            )
+
+    return errors
+
+
 def clear_form_cache():
     """Clear the in-memory form and constraints cache."""
     _FORM_CACHE.clear()
