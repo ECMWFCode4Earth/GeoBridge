@@ -38,6 +38,23 @@ _VOCABULARY_PATH = Path(__file__).parent / "vocabulary.yaml"
 # ---------------------------------------------------------------------------
 
 @dataclass
+class ResourceMatch:
+    """A deduplicated dataset+variable pair resolved from a free-text query."""
+
+    dataset_id: str
+    variable: str
+    confidence: float = 0.0
+    themes: list[str] = field(default_factory=list)
+    use_cases: list[str] = field(default_factory=list)
+
+    def __repr__(self) -> str:
+        return (
+            f"ResourceMatch(dataset={self.dataset_id!r}, "
+            f"variable={self.variable!r}, confidence={self.confidence:.2f})"
+        )
+
+
+@dataclass
 class SemanticMatch:
     """A single resolved use case with concrete recommendations."""
 
@@ -408,3 +425,77 @@ def semantic_search(
 
     matches.sort(key=lambda m: m.confidence, reverse=True)
     return matches[:max_results]
+
+
+def semantic_resources(
+    query: str,
+    max_results: int = 10,
+    min_confidence: float = 0.1,
+) -> list[ResourceMatch]:
+    """
+    Resolve a free-text query into a deduplicated list of datasets and variables.
+
+    Unlike :func:`semantic_search`, which returns one result per use case,
+    this function merges all matching use cases that share the same
+    (dataset_id, variable) pair. Confidence scores are accumulated across
+    contributing use cases and then normalised to [0, 1].
+
+    Parameters
+    ----------
+    query : str
+        Free-text query, e.g. "temperature and air quality over cities".
+    max_results : int
+        Maximum number of (dataset, variable) pairs to return (default 10).
+    min_confidence : float
+        Minimum accumulated confidence to include a pair (default 0.1).
+
+    Returns
+    -------
+    list[ResourceMatch]
+        Sorted by descending confidence. Each entry carries the dataset id,
+        variable name, accumulated confidence, and the use-case ids that
+        contributed to the score.
+
+    Examples
+    --------
+    >>> resources = gb.semantic_resources("urban heat and air pollution")
+    >>> for r in resources:
+    ...     print(r.dataset_id, r.variable, r.confidence)
+    """
+    use_case_matches = semantic_search(
+        query,
+        max_results=max_results * 3,  # cast a wide net before deduplication
+        min_confidence=min_confidence,
+    )
+
+    # Accumulate confidence per (dataset_id, variable) key
+    accumulated: dict[tuple[str, str], ResourceMatch] = {}
+    for m in use_case_matches:
+        key = (m.dataset_id, m.variable)
+        if key in accumulated:
+            existing = accumulated[key]
+            existing.confidence += m.confidence
+            if m.theme not in existing.themes:
+                existing.themes.append(m.theme)
+            if m.use_case not in existing.use_cases:
+                existing.use_cases.append(m.use_case)
+        else:
+            accumulated[key] = ResourceMatch(
+                dataset_id=m.dataset_id,
+                variable=m.variable,
+                confidence=m.confidence,
+                themes=[m.theme],
+                use_cases=[m.use_case],
+            )
+
+    results = list(accumulated.values())
+
+    # Normalise so the top score is 1.0
+    if results:
+        max_conf = max(r.confidence for r in results)
+        if max_conf > 0:
+            for r in results:
+                r.confidence = round(r.confidence / max_conf, 4)
+
+    results.sort(key=lambda r: r.confidence, reverse=True)
+    return results[:max_results]

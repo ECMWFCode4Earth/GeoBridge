@@ -67,7 +67,9 @@ from geobridge.modules.fuse import (
 )
 from geobridge.semantic.engine import (
     semantic_search,
+    semantic_resources,
     SemanticMatch,
+    ResourceMatch,
     list_themes,
     list_use_cases,
 )
@@ -120,7 +122,9 @@ __all__ = [
     "FusedLayer",
     # Semantic
     "semantic_search",
+    "semantic_resources",
     "SemanticMatch",
+    "ResourceMatch",
     "list_themes",
     "list_use_cases",
 ]
