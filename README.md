@@ -84,7 +84,7 @@ This avoids the most common build failures (GDAL, PROJ, libtiff).
 ### Step 3 — Clone and install GeoBridge
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/geobridge.git
+git clone https://github.com/ECMWFCode4Earth/GeoBridge
 cd geobridge
 pip install -e ".[zarr]"
 ```
