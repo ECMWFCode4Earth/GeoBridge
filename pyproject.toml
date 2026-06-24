@@ -60,7 +60,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/geobridge"
+Homepage = "https://github.com/ECMWFCode4Earth/GeoBridge"
 Repository = "https://github.com/your-org/geobridge"
 Issues = "https://github.com/your-org/geobridge/issues"
 
