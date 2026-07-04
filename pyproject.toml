@@ -58,11 +58,17 @@ dev = [
   "types-requests",
   "build",
 ]
+docs = [
+  "sphinx>=7.0",
+  "sphinx-rtd-theme>=2.0",
+  "sphinx-autodoc-typehints>=1.25",
+]
 
 [project.urls]
 Homepage = "https://github.com/ECMWFCode4Earth/GeoBridge"
 Repository = "https://github.com/your-org/geobridge"
 Issues = "https://github.com/your-org/geobridge/issues"
+Documentation = "https://geobridge.readthedocs.io"
 
 [tool.hatch.build.targets.wheel]
 packages = ["geobridge"]
