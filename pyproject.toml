@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "geobridge"
-version = "0.1.1"
+dynamic = ["version"]
 description = "Python bridge between Copernicus Data Stores (C3S, CAMS, CEMS) and mainstream GIS operations"
 readme = "README.md"
 license = "MIT"
@@ -68,6 +68,9 @@ Homepage = "https://github.com/ECMWFCode4Earth/GeoBridge"
 Repository = "https://github.com/ECMWFCode4Earth/GeoBridge"
 Issues = "https://github.com/ECMWFCode4Earth/GeoBridge/issues"
 Documentation = "https://geobridge.readthedocs.io"
+
+[tool.hatch.version]
+path = "geobridge/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["geobridge"]
