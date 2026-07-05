@@ -81,18 +81,30 @@ conda install -c conda-forge rasterio rioxarray zarr fsspec httpio dask -y
 
 This avoids the most common build failures (GDAL, PROJ, libtiff).
 
-### Step 3 — Clone and install GeoBridge
+### Step 3 — Install GeoBridge
+
+GeoBridge is published on PyPI: https://pypi.org/project/geobridge/
+
+```bash
+pip install "geobridge[full]"
+```
+
+The `[full]` extra adds everything: xarray/rasterio/zarr for
+`zarr_to_geotiff()`, plus OWSLib (WMTS) and cfgrib (GRIB support). Use
+`geobridge[zarr]` instead if you only need the ARCO extraction path, or
+plain `pip install geobridge` for the lightweight core (`discover()`,
+`wmts_layer()`, `to_qgis_style()`, and the semantic search functions all
+work with only `pyyaml`, the sole hard runtime dependency — no extra
+needed).
+
+If you're contributing to GeoBridge itself, install from a clone in
+editable mode instead so your local edits take effect immediately:
 
 ```bash
 git clone https://github.com/ECMWFCode4Earth/GeoBridge
 cd geobridge
-pip install -e ".[zarr]"
+pip install -e ".[dev]"
 ```
-
-`-e` installs in editable mode so you can pull updates without
-reinstalling. The `[zarr]` extra adds the optional dependencies needed
-for `zarr_to_geotiff()`. Use `.[full]` to also get OWSLib (WMTS) and
-cfgrib (GRIB support).
 
 ### Step 4 — Configure your credentials
 
@@ -114,32 +126,6 @@ writing it to a file:
 ```bash
 export CDS_API_KEY=YOUR-CDS-API-KEY-HERE
 ```
-
-### Step 5 — Verify the installation
-
-Run the bundled smoke test. It exercises every module without making
-network calls:
-
-```bash
-PYTHONPATH=. python smoke_test.py
-```
-
-Expected: nine stages all pass, ending with `ALL SMOKE TESTS PASSED`.
-
-### Step 6 — Run the Athens demo
-
-This is the end-to-end demonstration. It extracts ERA5 temperature for
-Athens summer 2023, writes a Cloud Optimized GeoTIFF, and generates a
-matching QGIS style:
-
-```bash
-python examples/athens_urban_heat.py
-```
-
-Expected runtime is roughly one minute on a reasonable broadband
-connection. The output appears in `./athens_outputs/`. Open the `.tif` in
-QGIS, load the `.qml` style alongside it, and you should see Athens
-temperatures rendered with a calibrated colour ramp.
 
 ---
 

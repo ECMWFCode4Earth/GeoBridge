@@ -1,5 +1,6 @@
 # Claude
 .claude/
+CLAUDE.md
 
 # Python
 __pycache__/
@@ -22,6 +23,7 @@ build/
 
 # folders
 examples/
+notes/
 
 # PyPI packaging (local only)
 *_pypi.*
