@@ -22,3 +22,6 @@ build/
 
 # folders
 examples/
+
+# PyPI packaging (local only)
+*_pypi.*

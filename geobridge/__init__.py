@@ -83,6 +83,7 @@ from geobridge.modules.form import (
     fetch_form,
     fetch_constraints,
     valid_variables_for_product_type,
+    validate_request,
     FormSchema,
 )
 
@@ -114,6 +115,7 @@ __all__ = [
     "fetch_form",
     "fetch_constraints",
     "valid_variables_for_product_type",
+    "validate_request",
     "FormSchema",
     # Styling
     "to_qgis_style",

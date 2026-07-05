@@ -4,21 +4,20 @@ build-backend = "hatchling.build"
 
 [project]
 name = "geobridge"
-version = "0.1.0"
-description = "Python bridge between Copernicus Data Stores (C3S, CAMS, CEMS) and mainstream GIS platforms"
+version = "0.1.1"
+description = "Python bridge between Copernicus Data Stores (C3S, CAMS, CEMS) and mainstream GIS operations"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
 requires-python = ">=3.10"
-authors = [{ name = "GeoBridge contributors" }]
+authors = [{ name = "Kostas Fokeas and Ilias Machairas" }]
 keywords = [
   "copernicus", "climate", "GIS", "WMTS", "ERA5", "CAMS", "CEMS",
-  "zarr", "geotiff", "earth-observation", "qgis"
+  "zarr", "geotiff", "earth-observation"
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -60,9 +59,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/geobridge"
-Repository = "https://github.com/your-org/geobridge"
-Issues = "https://github.com/your-org/geobridge/issues"
+Homepage = "https://github.com/ECMWFCode4Earth/GeoBridge"
+Repository = "https://github.com/ECMWFCode4Earth/GeoBridge"
+Issues = "https://github.com/ECMWFCode4Earth/GeoBridge/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["geobridge"]
