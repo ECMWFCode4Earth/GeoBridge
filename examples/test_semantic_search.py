@@ -7,8 +7,8 @@ def main():
     gb.authenticate()
 
     # 2. Resolve the user's intent via semantic search
-    print("\n[2/4] Resolving 'I want to study floods' via semantic search...")
-    matches = gb.semantic_search("I want to study floods")
+    print("\n[2/4] Resolving 'I want to study temperature' via semantic search...")
+    matches = gb.semantic_search("moisture")
     top = matches[0]
     print(f"  Top match: {top.use_case_label}")
     print(f"  Dataset:   {top.dataset_id}")

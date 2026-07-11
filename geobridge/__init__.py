@@ -61,6 +61,12 @@ from geobridge.modules.extract import (
 from geobridge.modules.style import (
     to_qgis_style,
 )
+from geobridge.modules.timeseries import (
+    point_value,
+    point_time_series,
+    PointSample,
+    TimeSeriesError,
+)
 from geobridge.modules.fuse import (
     fuse,
     FusedLayer,
@@ -119,6 +125,11 @@ __all__ = [
     "FormSchema",
     # Styling
     "to_qgis_style",
+    # Time series — WMTS GetFeatureInfo path (no download)
+    "point_value",
+    "point_time_series",
+    "PointSample",
+    "TimeSeriesError",
     # Fusion
     "fuse",
     "FusedLayer",
