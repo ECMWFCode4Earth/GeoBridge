@@ -64,6 +64,7 @@ from geobridge.modules.style import (
 from geobridge.modules.timeseries import (
     point_value,
     point_time_series,
+    zarr_point_time_series,
     PointSample,
     TimeSeriesError,
 )
@@ -130,6 +131,8 @@ __all__ = [
     "point_time_series",
     "PointSample",
     "TimeSeriesError",
+    # Time series — ARCO Zarr path (bulk read, better for long ranges)
+    "zarr_point_time_series",
     # Fusion
     "fuse",
     "FusedLayer",
