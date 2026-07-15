@@ -514,9 +514,38 @@ def _ensure_crs(da, lon_name: str, lat_name: str):
     return da
 
 
-def _write_geotiff(da, output_path: Path, cog: bool) -> Path:
+def _band_descriptions(
+    da, dataset_id: str, variable: str, time_name: Optional[str],
+) -> list[str]:
+    """Build one band name per output band as ``{dataset}_{variable}_{ISO timestamp}``.
+
+    The band axis is whatever dim is left after selecting x/y (normally the
+    time dimension). Falls back to a single dataset+variable name when there
+    is no time axis (e.g. a single static band).
+    """
+    prefix = f"{dataset_id}_{variable}"
+    if time_name is not None and time_name in da.dims:
+        times = da[time_name].values
+        names = []
+        for t in times:
+            ts = t if isinstance(t, str) else str(t)[:19].replace(" ", "T")
+            names.append(f"{prefix}_{ts}")
+        return names
+    return [prefix]
+
+
+def _write_geotiff(
+    da, output_path: Path, cog: bool, band_names: Optional[list[str]] = None,
+) -> Path:
     """Write a DataArray to GeoTIFF (optionally Cloud Optimized)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if band_names:
+        # rioxarray writes GDAL per-band descriptions from `long_name` when
+        # it is a sequence matching the number of bands.
+        da = da.copy()
+        da.attrs["long_name"] = tuple(band_names)
+
     if cog:
         da.rio.to_raster(
             output_path, driver="COG",
@@ -527,6 +556,7 @@ def _write_geotiff(da, output_path: Path, cog: bool) -> Path:
             output_path, driver="GTiff",
             compress="DEFLATE", tiled=True,
         )
+
     return output_path
 
 
@@ -695,8 +725,10 @@ def zarr_to_geotiff(
                        f"{safe_dataset}_{short_var}_{aggregation}.tif")
     output_path = Path(output_path)
 
+    band_names = _band_descriptions(da, dataset, short_var, coord_names["time"])
+
     try:
-        return _write_geotiff(da, output_path, cog)
+        return _write_geotiff(da, output_path, cog, band_names=band_names)
     except Exception as exc:
         raise ExtractionError(
             f"Failed to write GeoTIFF to {output_path}: {exc}"

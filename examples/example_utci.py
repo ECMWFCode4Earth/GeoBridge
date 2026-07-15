@@ -17,7 +17,7 @@ def main():
         variable='mrt',
         bbox=(23.0, 37.5, 24.5, 38.5),
         #time_range=('2023-07-01', '2023-07-31'),
-        time_range=("2023-07-15T12:00", "2023-07-15T12:00"),
+        time_range=("2023-07-15T12:00", "2023-07-16T12:00"),
         aggregation='raw',
         output_path=output_file,
     )
