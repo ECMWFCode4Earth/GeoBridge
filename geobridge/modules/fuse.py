@@ -94,6 +94,7 @@ class FusedLayer:
             dim="band",
         )
         stacked = stacked.assign_coords(band=[self.name_a, self.name_b])
+        stacked.attrs["long_name"] = (self.name_a, self.name_b)
 
         if stacked.rio.crs is None:
             stacked = stacked.rio.write_crs("EPSG:4326")

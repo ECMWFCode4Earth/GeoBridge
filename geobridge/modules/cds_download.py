@@ -18,9 +18,10 @@ plugin, the Athens demo) can treat them interchangeably.
 
 Authentication
 --------------
-Uses the same bearer token as the ARCO path::
+The job-submission API requires the CDS key as a ``PRIVATE-TOKEN`` header
+(unlike the ARCO-Zarr path, which uses ``Authorization: Bearer``)::
 
-    Authorization: Bearer <CDS_API_KEY>
+    PRIVATE-TOKEN: <CDS_API_KEY>
 
 Rate limiting and queue times
 ------------------------------
@@ -87,8 +88,8 @@ class CdsJobTimeout(Exception):
 # ---------------------------------------------------------------------------
 
 def _auth_headers() -> dict:
-    from geobridge.auth import auth_header
-    return {**auth_header(), "Content-Type": "application/json",
+    from geobridge.auth import get_token
+    return {"PRIVATE-TOKEN": get_token(), "Content-Type": "application/json",
             "Accept": "application/json"}
 
 
@@ -192,8 +193,17 @@ def _poll_job(
             for link in status.get("links", []):
                 if link.get("rel") in ("result", "download"):
                     return link["href"]
-            # Fallback: results endpoint
-            return status_url.replace("/jobs/", "/jobs/") + "/results"
+            # Fallback: the OGC API Processes "results" endpoint. This does
+            # NOT return the file itself — it returns a JSON document whose
+            # actual download URL is nested at asset.value.href.
+            results_url = status_url + "/results"
+            results = _get_json(results_url)
+            try:
+                return results["asset"]["value"]["href"]
+            except (KeyError, TypeError) as exc:
+                raise CdsApiError(
+                    f"Could not find a download URL in results response: {results}"
+                ) from exc
 
         if job_status in ("failed", "dismissed", "error"):
             detail = status.get("detail") or status.get("message") or str(status)

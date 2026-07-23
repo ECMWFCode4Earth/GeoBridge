@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "geobridge"
 dynamic = ["version"]
 description = "Python bridge between Copernicus Data Stores (C3S, CAMS, CEMS) and mainstream GIS operations"
-readme = "README.md"
+readme = "README_pypi.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [{ name = "Kostas Fokeas and Ilias Machairas" }]
@@ -45,6 +45,7 @@ full = [
   "owslib>=0.28",
   "pyproj>=3.5",
   "cfgrib>=0.9.10",
+  "netCDF4>=1.6",
 ]
 dev = [
   "geobridge[full]",
