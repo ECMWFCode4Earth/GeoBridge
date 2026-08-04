@@ -8,7 +8,7 @@ def main():
 
     # 2. Resolve the user's intent via semantic search
     print("\n[2/4] Resolving 'I want to study temperature' via semantic search...")
-    matches = gb.semantic_search("moisture")
+    matches = gb.semantic_search("fire forecast")
     top = matches[0]
     print(f"  Top match: {top.use_case_label}")
     print(f"  Dataset:   {top.dataset_id}")

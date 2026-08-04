@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
+from difflib import SequenceMatcher
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
@@ -162,17 +163,50 @@ _STOPWORDS = {
 }
 
 
+_STEM_SUFFIXES = ("ing", "edly", "ed", "es", "s")
+
+
+def _stem(token: str) -> str:
+    """Strip common inflectional suffixes so e.g. 'flooding'/'floods' collapse to 'flood'."""
+    for suffix in _STEM_SUFFIXES:
+        if token.endswith(suffix) and len(token) - len(suffix) >= 3:
+            return token[: -len(suffix)]
+    return token
+
+
 def _tokenize(query: str) -> list[str]:
-    """Lowercase, strip punctuation, drop stopwords."""
+    """Lowercase, strip punctuation, drop stopwords, stem."""
     tokens = re.findall(r"[a-zA-Z0-9.]+", query.lower())
-    return [t for t in tokens if t not in _STOPWORDS and len(t) > 1]
+    return [_stem(t) for t in tokens if t not in _STOPWORDS and len(t) > 1]
+
+
+def _fuzzy_equal(a: str, b: str, threshold: float = 0.84) -> bool:
+    """True if *a* and *b* are identical or close enough to be a typo of each other."""
+    if a == b:
+        return True
+    # Guard short tokens: fuzzy comparison on 2-3 char strings produces false positives.
+    if len(a) < 4 or len(b) < 4:
+        return False
+    return SequenceMatcher(None, a, b).ratio() >= threshold
+
+
+def _fuzzy_intersect(query_tokens: set[str], term_tokens: set[str]) -> set[str]:
+    """Subset of *term_tokens* that fuzzy-match some token in *query_tokens*."""
+    return {t for t in term_tokens if any(_fuzzy_equal(q, t) for q in query_tokens)}
+
+
+def _fuzzy_subset(term_tokens: set[str], query_tokens: set[str]) -> bool:
+    """True if every token in *term_tokens* fuzzy-matches some token in *query_tokens*."""
+    return bool(term_tokens) and all(
+        any(_fuzzy_equal(q, t) for q in query_tokens) for t in term_tokens
+    )
 
 
 def _term_overlap(query_tokens: set[str], term_tokens: set[str]) -> float:
-    """Fraction of *term_tokens* present in *query_tokens*."""
+    """Fraction of *term_tokens* fuzzy-present in *query_tokens*."""
     if not term_tokens:
         return 0.0
-    return len(query_tokens & term_tokens) / len(term_tokens)
+    return len(_fuzzy_intersect(query_tokens, term_tokens)) / len(term_tokens)
 
 
 def _score_theme(query_tokens: set[str], theme_id: str, theme_data: dict) -> tuple[float, list[str]]:
@@ -194,19 +228,19 @@ def _score_theme(query_tokens: set[str], theme_id: str, theme_data: dict) -> tup
     overlap = _term_overlap(query_tokens, label_tokens)
     if overlap > 0:
         score += 0.4 * overlap
-        matches.extend(query_tokens & label_tokens)
+        matches.extend(_fuzzy_intersect(query_tokens, label_tokens))
 
     # Synonyms
     for synonym in theme_data.get("synonyms", []):
         synonym_tokens = set(_tokenize(synonym))
-        if synonym_tokens and synonym_tokens.issubset(query_tokens):
+        if _fuzzy_subset(synonym_tokens, query_tokens):
             score += 0.6
             matches.append(synonym)
         else:
             o = _term_overlap(query_tokens, synonym_tokens)
             if o > 0.5:
                 score += 0.3 * o
-                matches.extend(query_tokens & synonym_tokens)
+                matches.extend(_fuzzy_intersect(query_tokens, synonym_tokens))
 
     return score, list(set(matches))
 
@@ -240,7 +274,7 @@ def _score_use_case(
     overlap = _term_overlap(query_tokens, label_tokens)
     if overlap > 0:
         score += 0.5 * overlap
-        matches.extend(query_tokens & label_tokens)
+        matches.extend(_fuzzy_intersect(query_tokens, label_tokens))
 
     # Variable name match (e.g. "pm2.5", "temperature")
     # Support both new 'variable' (singular) and old 'recommended_variables' (list)
@@ -249,7 +283,7 @@ def _score_use_case(
         variables_to_check = [use_case_data["variable"]]
     for variable in variables_to_check:
         var_tokens = set(_tokenize(variable))
-        if var_tokens and var_tokens.issubset(query_tokens):
+        if _fuzzy_subset(var_tokens, query_tokens):
             score += 0.4
             matches.append(variable)
 
