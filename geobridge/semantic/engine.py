@@ -297,6 +297,25 @@ def _score_use_case(
     return score, list(set(matches))
 
 
+def _resolve_dataset_variable(use_case_data: dict) -> tuple[str | None, str | None]:
+    """
+    Resolve a use case's dataset and variable.
+
+    New vocabulary uses singular 'dataset' / 'variable' fields. Old
+    vocabulary used 'recommended_datasets' / 'recommended_variables' lists.
+    Support both for backwards compatibility.
+    """
+    dataset_id = (
+        use_case_data.get("dataset")
+        or (use_case_data.get("recommended_datasets") or [None])[0]
+    )
+    variable = (
+        use_case_data.get("variable")
+        or (use_case_data.get("recommended_variables") or [None])[0]
+    )
+    return dataset_id, variable
+
+
 # ---------------------------------------------------------------------------
 # Guidance text builder
 # ---------------------------------------------------------------------------
@@ -414,18 +433,7 @@ def semantic_search(
         if score < min_confidence:
             continue
 
-        # Resolve dataset and variable.
-        # New vocabulary uses singular 'dataset' / 'variable' fields.
-        # Old vocabulary used 'recommended_datasets' / 'recommended_variables' lists.
-        # Support both for backwards compatibility.
-        dataset_id = (
-            uc_data.get("dataset")
-            or (uc_data.get("recommended_datasets") or [None])[0]
-        )
-        variable = (
-            uc_data.get("variable")
-            or (uc_data.get("recommended_variables") or [None])[0]
-        )
+        dataset_id, variable = _resolve_dataset_variable(uc_data)
         if not dataset_id or not variable:
             continue
 
@@ -467,12 +475,24 @@ def semantic_resources(
     min_confidence: float = 0.1,
 ) -> list[ResourceMatch]:
     """
-    Resolve a free-text query into a deduplicated list of datasets and variables.
+    Resolve a free-text query into a ranked list of datasets and variables.
 
-    Unlike :func:`semantic_search`, which returns one result per use case,
-    this function merges all matching use cases that share the same
-    (dataset_id, variable) pair. Confidence scores are accumulated across
-    contributing use cases and then normalised to [0, 1].
+    Combines two retrieval signals so neither's blind spot dominates:
+
+    - **Rule-based** (:func:`semantic_search`, fuzzy token/synonym matching
+      over the curated ``vocabulary.yaml`` taxonomy). Reliable for phrasing
+      curators anticipated — including paraphrases with zero literal overlap
+      with a dataset's own description (e.g. "urban heat island" resolving
+      to a temperature dataset whose text never says "heat" or "urban").
+    - **TF-IDF catalog retrieval** (:mod:`geobridge.semantic.catalog`, cosine
+      similarity over every dataset/subset/variable in the full ARCO
+      catalogue — not just the ~40 curated use cases). Extends coverage to
+      resources no curator has written a use case for, at the cost of no
+      synonym knowledge: it only sees literal shared vocabulary.
+
+    A (dataset_id, variable) pair's final confidence is the stronger of the
+    two signals; pairs found by both keep their curated themes/use_cases.
+    Pairs found only by TF-IDF are still returned, with empty themes/use_cases.
 
     Parameters
     ----------
@@ -481,14 +501,15 @@ def semantic_resources(
     max_results : int
         Maximum number of (dataset, variable) pairs to return (default 10).
     min_confidence : float
-        Minimum accumulated confidence to include a pair (default 0.1).
+        Minimum confidence to include a pair (default 0.1).
 
     Returns
     -------
     list[ResourceMatch]
         Sorted by descending confidence. Each entry carries the dataset id,
-        variable name, accumulated confidence, and the use-case ids that
-        contributed to the score.
+        variable name, confidence, and any curated themes/use_cases that
+        happen to match — empty lists when no curated use case exists for
+        that resource.
 
     Examples
     --------
@@ -496,33 +517,47 @@ def semantic_resources(
     >>> for r in resources:
     ...     print(r.dataset_id, r.variable, r.confidence)
     """
-    use_case_matches = semantic_search(
-        query,
-        max_results=max_results * 3,  # cast a wide net before deduplication
-        min_confidence=min_confidence,
-    )
+    if not query.strip():
+        return []
 
-    # Accumulate confidence per (dataset_id, variable) key
-    accumulated: dict[tuple[str, str], ResourceMatch] = {}
+    from geobridge.semantic import catalog
+    ranked = catalog.query_catalog(query, top_k=max_results * 3)
+    tfidf_scores = {(dataset_id, variable): score for dataset_id, variable, score in ranked}
+
+    use_case_matches = semantic_search(query, max_results=max_results * 3, min_confidence=min_confidence)
+
+    combined: dict[tuple[str, str], ResourceMatch] = {}
+
     for m in use_case_matches:
         key = (m.dataset_id, m.variable)
-        if key in accumulated:
-            existing = accumulated[key]
-            existing.confidence += m.confidence
+        confidence = max(m.confidence, tfidf_scores.pop(key, 0.0))
+        if key in combined:
+            existing = combined[key]
+            existing.confidence = max(existing.confidence, confidence)
             if m.theme not in existing.themes:
                 existing.themes.append(m.theme)
             if m.use_case not in existing.use_cases:
                 existing.use_cases.append(m.use_case)
         else:
-            accumulated[key] = ResourceMatch(
+            combined[key] = ResourceMatch(
                 dataset_id=m.dataset_id,
                 variable=m.variable,
-                confidence=m.confidence,
+                confidence=confidence,
                 themes=[m.theme],
                 use_cases=[m.use_case],
             )
 
-    results = list(accumulated.values())
+    # TF-IDF-only matches — extends coverage beyond the curated taxonomy.
+    for (dataset_id, variable), score in tfidf_scores.items():
+        combined[(dataset_id, variable)] = ResourceMatch(
+            dataset_id=dataset_id,
+            variable=variable,
+            confidence=score,
+            themes=[],
+            use_cases=[],
+        )
+
+    results = [r for r in combined.values() if r.confidence >= min_confidence]
 
     # Normalise so the top score is 1.0
     if results:

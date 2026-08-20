@@ -1,7 +1,5 @@
 """Tests for geobridge.semantic.engine — query resolution and matching."""
 
-import pytest
-
 from geobridge.semantic import engine
 
 
@@ -133,3 +131,24 @@ def test_semantic_match_recommended_aggregation_is_set():
         "raw", "daily_mean", "daily_max", "daily_min",
         "monthly_mean", "monthly_max", "annual_mean",
     }
+
+
+# ---------------------------------------------------------------------------
+# semantic_resources — dataset/variable-first retrieval (no use_case required)
+# ---------------------------------------------------------------------------
+
+def test_semantic_resources_returns_result_without_curated_use_case():
+    # "dust" is an ARCO variable with no curated use_case in vocabulary.yaml
+    # (only mentioned in prose elsewhere) — this is the regression test that
+    # dataset/variable coverage is no longer capped by curation.
+    results = engine.semantic_resources("desert dust concentration in air")
+    assert len(results) > 0
+    dust_matches = [r for r in results if r.variable == "dust"]
+    assert dust_matches
+    assert dust_matches[0].use_cases == []
+
+
+def test_semantic_resources_attaches_use_case_when_matched():
+    results = engine.semantic_resources("urban heat island")
+    assert len(results) > 0
+    assert any(r.use_cases for r in results)
