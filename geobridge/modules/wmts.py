@@ -53,7 +53,6 @@ from typing import Optional, Union
 from geobridge.modules.discover import (
     LayerDescriptor,
     discover_one,
-    _SERVICE_LABELS,
     _colormap_for_variable,
 )
 
@@ -90,7 +89,7 @@ _TMS_BY_CRS: dict[str, str] = {
 
 @dataclass
 class WmtsLayer:
-    """A resolved WMTS layer ready for use in QGIS, Leaflet, or any viewer.
+    """A resolved WMTS layer ready for use in QGIS or any viewer.
 
     The ECMWF WMTS layer identifier encodes dataset, subset, and variable
     directly in the layer name path::
@@ -124,8 +123,8 @@ class WmtsLayer:
     def url(self) -> str:
         """Return the WMTS GetTile URL template with {x},{y},{z} tokens.
 
-        Suitable for Leaflet, OpenLayers, or any viewer that supports
-        WMTS-style tile URL templates. For QGIS, use ``to_qgis()`` instead.
+        Suitable for OpenLayers or any viewer that supports WMTS-style
+        tile URL templates. For QGIS, use ``to_qgis()`` instead.
         """
         params = {
             "SERVICE": "WMTS",
@@ -373,7 +372,7 @@ def wmts_layer(
     Returns
     -------
     WmtsLayer
-        Resolved layer with ``.to_qgis()``, ``.to_leaflet()``, ``.url``,
+        Resolved layer with ``.to_qgis()``, ``.url``,
         ``.tile_url(z, x, y)``, ``.feature_info_url(...)``.
 
     Raises

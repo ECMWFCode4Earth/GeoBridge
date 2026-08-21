@@ -2,7 +2,7 @@
 GeoBridge — Copernicus to GIS interoperability toolkit.
 
 A Python library that bridges Copernicus Data Stores (C3S, CAMS, CEMS)
-and mainstream GIS platforms (QGIS, Leaflet, ArcGIS, Jupyter).
+and mainstream GIS platforms (QGIS, ArcGIS, Jupyter).
 
 Quickstart
 ----------
@@ -31,7 +31,7 @@ Semantic search
 
 from __future__ import annotations
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 __author__ = "GeoBridge contributors"
 __license__ = "MIT"
 

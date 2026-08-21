@@ -61,23 +61,8 @@ def test_has_wmts_requires_both_url_and_layer():
     ).has_wmts
 
 
-def test_to_leaflet_none_when_no_wmts():
-    assert _make_descriptor().to_leaflet() is None
-
-
 def test_to_qgis_none_when_no_wmts():
     assert _make_descriptor().to_qgis() is None
-
-
-def test_to_leaflet_returns_config_when_wmts_available():
-    d = _make_descriptor(
-        wmts_url="https://wmts.example.com",
-        wmts_layer_name="layer-1",
-    )
-    leaflet = d.to_leaflet()
-    assert leaflet is not None
-    assert leaflet["url"] == "https://wmts.example.com"
-    assert leaflet["options"]["layer"] == "layer-1"
 
 
 def test_to_qgis_returns_wms_provider_when_wmts_available():

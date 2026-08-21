@@ -46,12 +46,6 @@ _OVERRIDES_PATH = (
     Path(__file__).parent.parent / "semantic" / "arco_overrides.yaml"
 )
 
-_SERVICE_LABELS = {
-    "C3S":  "Copernicus Climate Change Service",
-    "CAMS": "Copernicus Atmosphere Monitoring Service",
-    "CEMS": "Copernicus Emergency Management Service",
-}
-
 _VARIABLE_COLORMAPS: dict[str, dict] = {
     "2m_temperature":      {"palette": "RdBu_r",   "unit": "K"},
     "t2m":                 {"palette": "RdBu_r",   "unit": "K"},
@@ -164,27 +158,6 @@ class LayerDescriptor:
     # ------------------------------------------------------------------
     # Export helpers
     # ------------------------------------------------------------------
-
-    def to_leaflet(self) -> Optional[dict]:
-        """Leaflet TileLayer.WMTS config dict, or None when no WMTS."""
-        if not self.has_wmts:
-            return None
-        tms = (
-            self.tile_matrix_sets[0].identifier
-            if self.tile_matrix_sets else "EPSG:3857"
-        )
-        return {
-            "url": self.wmts_url,
-            "options": {
-                "layer": self.wmts_layer_name,
-                "tilematrixset": tms,
-                "format": "image/png",
-                "transparent": True,
-                "attribution": (
-                    f"© {_SERVICE_LABELS.get(self.service, self.service)} | ECMWF"
-                ),
-            },
-        }
 
     def to_qgis(self) -> Optional[dict]:
         """QgsRasterLayer kwargs dict, or None when no WMTS."""

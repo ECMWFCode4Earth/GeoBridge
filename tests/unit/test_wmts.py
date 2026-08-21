@@ -111,15 +111,6 @@ def test_wmts_layer_legend_url_present():
     assert "GetLegendGraphic" in layer.legend_url
 
 
-def test_wmts_layer_to_leaflet_dict_shape():
-    desc = make_descriptor()
-    layer = wmts.wmts_layer("ds", "2m_temperature", "2023-01-01", descriptor=desc)
-    leaflet = layer.to_leaflet()
-    assert "url" in leaflet
-    assert leaflet["options"]["time"] == "2023-01-01T00:00:00Z"
-    assert leaflet["options"]["transparent"] is True
-
-
 def test_wmts_layer_to_qgis_includes_time():
     desc = make_descriptor()
     layer = wmts.wmts_layer("ds", "2m_temperature", "2023-07-15", descriptor=desc)

@@ -25,7 +25,7 @@ The library is the foundation for the project's QGIS plugin.
   through the standard CDS API for datasets that are not yet in the ARCO lake,
   converts the result to GeoTIFF, and streams it to disk.
 - **WMTS.** `gb.wmts_layer()` returns a ready-to-use WMTS layer object for
-  live tile streaming inside QGIS or Leaflet.
+  live tile streaming inside QGIS.
 - **Form schema.** `gb.fetch_form()` and `gb.fetch_constraints()` retrieve the
   server-side parameter form for any dataset so your UI can build validated
   request widgets. `gb.valid_variables_for_product_type()` filters the variable

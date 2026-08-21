@@ -75,16 +75,12 @@ print("\n[4/12] Testing LayerDescriptor exports...")
 
 # ERA5 now has WMTS from the ARCO STAC catalogue
 if ds.has_wmts:
-    leaflet = ds.to_leaflet()
-    assert leaflet is not None and "url" in leaflet
     qgis = ds.to_qgis()
     assert qgis is not None and qgis["provider"] == "wms"
-    print(f"      to_leaflet() → ok (WMTS discovered from ARCO STAC) ✓")
     print(f"      to_qgis()    → ok ✓")
 else:
-    assert ds.to_leaflet() is None
     assert ds.to_qgis() is None
-    print(f"      to_leaflet() / to_qgis() → None (no WMTS) ✓")
+    print(f"      to_qgis() → None (no WMTS) ✓")
 
 # to_dict is always JSON-safe
 payload = ds.to_dict()
@@ -103,11 +99,9 @@ wmts_desc = LayerDescriptor(
     wmts_layer_name="GLOBAL_ANALYSISFORECAST_PHY_001_024/sst",
 )
 assert wmts_desc.has_wmts is True
-leaflet = wmts_desc.to_leaflet()
-assert leaflet is not None and "url" in leaflet
 qgis = wmts_desc.to_qgis()
 assert qgis is not None and qgis["provider"] == "wms"
-print(f"      to_leaflet() / to_qgis() for WMTS-enabled descriptor → ok ✓")
+print(f"      to_qgis() for WMTS-enabled descriptor → ok ✓")
 
 # ---------- Test 5: wmts_layer ----------
 print("\n[5/12] Testing wmts_layer...")
