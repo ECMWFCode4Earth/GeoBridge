@@ -22,7 +22,8 @@ build/
 .ipynb_checkpoints/
 
 # folders
-examples/
+examples/*
+!examples/athens_urban_heat.py
 notes/
 
 # PyPI packaging (local only)
