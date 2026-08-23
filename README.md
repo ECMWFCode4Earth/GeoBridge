@@ -16,27 +16,37 @@ The library is the foundation for the project's QGIS plugin.
 - **Discovery.** `gb.discover()` lists every dataset in the Copernicus
   catalogue with filters for keyword, service, variable, bounding box, and
   time range — all from a locally bundled snapshot, no network needed.
+  `gb.discover_one()` fetches a single dataset by ID.
 - **Authentication.** A single `gb.authenticate()` call handles credential
   resolution for the new ARCO bearer-token model.
 - **Extraction — ARCO path.** `gb.zarr_to_geotiff()` pulls a spatial / temporal
   subset from the ARCO Zarr Data Lake and writes it as a Cloud Optimized
-  GeoTIFF, ready for QGIS or ArcGIS.
+  GeoTIFF, ready for QGIS or ArcGIS. `gb.list_datasets()` and
+  `gb.list_variables()` enumerate what's available through this path.
 - **Extraction — CDS API path.** `gb.cds_to_geotiff()` submits a download job
   through the standard CDS API for datasets that are not yet in the ARCO lake,
   converts the result to GeoTIFF, and streams it to disk.
 - **WMTS.** `gb.wmts_layer()` returns a ready-to-use WMTS layer object for
   live tile streaming inside QGIS.
+- **Time series.** `gb.point_time_series()` and `gb.point_value()` sample a
+  single point over time via WMTS GetFeatureInfo requests — no download,
+  best for a handful to a few dozen time steps. `gb.zarr_point_time_series()`
+  reads the same point directly out of the ARCO Zarr archive in a few
+  chunked range-requests, and is the one to prefer for long time ranges.
 - **Form schema.** `gb.fetch_form()` and `gb.fetch_constraints()` retrieve the
   server-side parameter form for any dataset so your UI can build validated
   request widgets. `gb.valid_variables_for_product_type()` filters the variable
-  list to what the selected product type actually supports.
+  list to what the selected product type actually supports, and
+  `gb.validate_request()` checks a full request dict against the dataset's
+  constraints before you submit it.
 - **Styling.** `gb.to_qgis_style()` generate
   calibrated colour ramps for known Copernicus variables.
 - **Fusion.** `gb.fuse()` co-registers multiple layers onto a common grid
   for joint analysis (e.g. heat + air quality).
 - **Semantics.** `gb.semantic_search()` resolves user themes like
   "urban heat island" or "wildfire risk" into concrete dataset and
-  workflow recommendations. `gb.list_themes()` and `gb.list_use_cases()`
+  workflow recommendations. `gb.semantic_resources()` returns the matching
+  resources directly. `gb.list_themes()` and `gb.list_use_cases()`
   enumerate the built-in vocabulary.
 
 ---
@@ -148,6 +158,7 @@ geobridge/                              ← repository root
 │   │   ├── wmts.py                     ← WMTS layer
 │   │   ├── form.py                     ← dataset form schema & constraints
 │   │   ├── style.py                    ← QGIS QML export
+│   │   ├── timeseries.py               ← point value / time series (WMTS & Zarr)
 │   │   └── fuse.py                     ← multi-layer co-registration
 │   └── semantic/
 │       ├── engine.py                   ← rule-based query resolver
@@ -162,9 +173,7 @@ geobridge/                              ← repository root
 │
 ├── examples/
 │   ├── athens_urban_heat.py            ← end-to-end ERA5 demo
-│   ├── example_utci.py                 ← UTCI thermal comfort demo
-│   ├── examplepm2.5.py                 ← CAMS PM2.5 air quality demo
-│   └── ...                             ← additional live-test scripts
+|
 │
 └── tests/
     ├── test_auth.py
@@ -174,6 +183,7 @@ geobridge/                              ← repository root
         ├── test_extract.py
         ├── test_style.py
         ├── test_semantic.py
+        ├── test_catalog.py
         └── test_wmts.py
 ```
 
