@@ -200,7 +200,19 @@ def _get_constraints_url(dataset_id: str) -> Optional[str]:
 
 
 def _parse_widget(raw: dict) -> Optional[FormWidget]:
-    """Parse one form widget definition."""
+    """Parse one form widget definition.
+
+    CDS choice widgets store their allowed values in two different shapes:
+
+    * ``StringListWidget`` / ``StringChoiceWidget`` — a flat ``details.values``
+      list of strings, with display names in a separate ``details.labels`` map.
+    * ``StringListArrayWidget`` — values split across accordion groups under
+      ``details.groups``, each group carrying its own ``values`` list and
+      ``labels`` map (there is no top-level ``details.values``).
+
+    Both shapes are flattened here into a single ``{value, label}`` list,
+    keeping first-seen order and dropping duplicates.
+    """
     name = raw.get("name")
     label = raw.get("label", name or "")
     widget_type = raw.get("type", "")
@@ -208,29 +220,48 @@ def _parse_widget(raw: dict) -> Optional[FormWidget]:
     if not name:
         return None
 
-    # Extract values — different widget types store them differently
+    details = raw.get("details", {}) or {}
+
     values: list[dict] = []
+    seen: set[str] = set()
 
-    # StringListWidget / StringChoiceWidget
-    if "details" in raw:
-        details = raw["details"]
-        for item in details.get("values", []):
+    def _add(value: str, display: Optional[str] = None) -> None:
+        if not value or value in seen:
+            return
+        seen.add(value)
+        values.append({"value": value, "label": display or value})
+
+    def _consume(items: Any, label_map: dict) -> None:
+        if not isinstance(items, list):
+            return
+        for item in items:
             if isinstance(item, dict):
-                values.append({
-                    "value": item.get("value", ""),
-                    "label": item.get("label", item.get("value", "")),
-                })
+                v = item.get("value", "")
+                _add(v, item.get("label", label_map.get(v, v)))
             elif isinstance(item, str):
-                values.append({"value": item, "label": item})
+                _add(item, label_map.get(item, item))
 
-    # FreeformInputWidget / DateRangeWidget — no predefined values
+    # 1. Flat layout (StringListWidget / StringChoiceWidget)
+    _consume(details.get("values"), details.get("labels", {}) or {})
+
+    # 2. Grouped layout (StringListArrayWidget accordion groups)
+    for group_key in ("groups", "accordionGroups"):
+        groups = details.get(group_key)
+        if not isinstance(groups, list):
+            continue
+        for group in groups:
+            if isinstance(group, dict):
+                _consume(group.get("values"), group.get("labels", {}) or {})
+
+    # FreeformInputWidget / DateRangeWidget / GeographicExtentWidget — no
+    # predefined values, so ``values`` stays empty.
     return FormWidget(
         name=name,
         label=label,
         widget_type=widget_type,
         values=values,
         required=raw.get("required", True),
-        details=raw.get("details", {}),
+        details=details,
     )
 
 

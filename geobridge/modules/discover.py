@@ -321,6 +321,59 @@ def _pick_primary_subset(arco_entry: dict) -> Optional[dict]:
     return list(subsets.values())[0]
 
 
+# Names for the pre-composed wind vector layer, which is served alongside the
+# u/v components but is not itself listed in any subset's ``variables`` map.
+_WIND_LAYER_NAMES = {"wind", "wind10", "wind100", "wind_10m", "wind_100m"}
+
+
+def _subset_wmts_prefix(subset: dict, dataset_id: str, subset_id: str) -> str:
+    """Return the ``{dataset}/{subset}`` layer-name prefix for one subset."""
+    raw = (subset.get("wmts") or "").split("?")[0]
+    parts = raw.split("/teroWmts/")
+    if len(parts) == 2 and parts[1]:
+        return parts[1].rstrip("/")
+    return f"{dataset_id}/{subset_id}"
+
+
+def _arco_subset_for_variable(
+    dataset_id: str, variable: str
+) -> Optional[tuple[str, dict]]:
+    """Find the ARCO subset that actually serves *variable*.
+
+    ARCO datasets frequently split their variables across several subsets
+    (e.g. ``reanalysis_era5_land`` has eight: ``sfc-soil-temperature``,
+    ``sfc-pressure-precipitation``, ...).  The WMTS layer identifier encodes
+    the subset, so the correct subset must be resolved per-variable rather
+    than reusing the dataset's "primary" subset for everything.
+
+    Returns ``(layer_prefix, subset_dict)`` where ``layer_prefix`` is the
+    ``{dataset}/{subset}`` path for the WMTS layer name, or ``None`` when no
+    subset lists the variable.
+    """
+    arco = _load_arco_snapshot()
+    arco_id = dataset_id.replace("-", "_")
+    entry = arco.get(arco_id)
+    if not entry:
+        return None
+    subsets = entry.get("subsets") or {}
+
+    # 1. Direct hit — a subset whose ``variables`` map contains the name.
+    for sub_id, sub in subsets.items():
+        if variable in (sub.get("variables") or {}):
+            return _subset_wmts_prefix(sub, arco_id, sub_id), sub
+
+    # 2. Pre-composed wind vector layer — resolve to the subset carrying the
+    #    matching u/v components.
+    if variable.lower() in _WIND_LAYER_NAMES:
+        components = ("u100", "v100") if "100" in variable else ("u10", "v10")
+        for sub_id, sub in subsets.items():
+            svars = sub.get("variables") or {}
+            if any(c in svars for c in components):
+                return _subset_wmts_prefix(sub, arco_id, sub_id), sub
+
+    return None
+
+
 def _descriptor_from_arco(dataset_id: str, arco_entry: dict,
                           cds_entry: Optional[dict],
                           global_aliases: dict) -> LayerDescriptor:

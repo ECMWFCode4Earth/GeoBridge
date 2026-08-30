@@ -423,14 +423,41 @@ def wmts_layer(
     aliases = (_overrides or {}).get("variable_aliases", {})
     arco_variable = aliases.get(variable, variable)
 
-    # ECMWF WMTS layer id = "{dataset}/{subset}/{variable}"
-    layer_name = f"{descriptor.wmts_layer_name}/{arco_variable}"
+    # ECMWF WMTS layer id = "{dataset}/{subset}/{variable}".
+    #
+    # ARCO datasets split their variables across multiple subsets, and the
+    # subset is part of the layer identifier — so it must be resolved for the
+    # requested variable rather than reusing ``descriptor.wmts_layer_name``,
+    # which only carries the dataset's "primary" subset.
+    from geobridge.modules.discover import _arco_subset_for_variable
+    resolved = (
+        _arco_subset_for_variable(dataset, arco_variable)
+        or _arco_subset_for_variable(dataset, variable)
+    )
+    if resolved:
+        layer_prefix, _subset = resolved
+    else:
+        layer_prefix, _subset = descriptor.wmts_layer_name, None
+        logger.debug(
+            "No ARCO subset lists %r for %s — falling back to primary subset %r",
+            arco_variable, dataset, descriptor.wmts_layer_name,
+        )
+
+    layer_name = f"{layer_prefix}/{arco_variable}"
+
+    # Per-variable colormap from the resolved subset (falls back to the
+    # descriptor's dataset-level colormap, then viridis).
+    _var_meta = (_subset.get("variables") or {}).get(arco_variable, {}) if _subset else {}
 
     # Style: auto-select from ARCO snapshot colormap, or use user-provided
     if style and style != "default":
         wmts_style = style
     else:
-        palette = (descriptor.colormap or {}).get("palette") or "viridis"
+        palette = (
+            _var_meta.get("colormap")
+            or (descriptor.colormap or {}).get("palette")
+            or "viridis"
+        )
         wmts_style = f"cmap:{palette}"
 
     tms_id, resolved_crs = _resolve_tile_matrix_set(descriptor, target_crs)
@@ -444,7 +471,13 @@ def wmts_layer(
         f"&FORMAT=image%2Fsvg%2Bxml"
     )
 
-    colormap = descriptor.colormap or _colormap_for_variable(variable)
+    if _var_meta:
+        colormap = {
+            "palette": _var_meta.get("colormap", "viridis"),
+            "unit": _var_meta.get("unit", ""),
+        }
+    else:
+        colormap = descriptor.colormap or _colormap_for_variable(variable)
 
     return WmtsLayer(
         dataset=dataset,
