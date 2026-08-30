@@ -110,7 +110,6 @@ themes:
       from 1940 to present at global 0.25° resolution.
     use_cases:
       - fire_danger_mapping
-      - fire_smoke_aerosol
       - fire_season_trend
 
   ocean_and_water:
@@ -175,30 +174,21 @@ themes:
   renewable_energy:
     label: "Renewable energy resources"
     synonyms:
-      - solar energy
-      - solar PV
       - wind energy
       - wind resource
       - wind power
       - offshore wind
-      - onshore wind
-      - capacity factor
       - energy planning
       - renewable
-      - PECD
       - wind atlas
       - turbine
       - hub height
     description: >
       Wind and solar resource datasets for renewable energy siting and
-      planning. Includes the Pan-European Climate Database (PECD) for
-      capacity factors and ERA5 upper-level wind components for
-      offshore wind assessment.
+      planning. Uses ERA5 upper-level wind components (u100/v100) for
+      offshore wind resource assessment.
     use_cases:
-      - wind_capacity_factor
-      - solar_pv_capacity_factor
       - offshore_wind_resource
-      - energy_seasonal_variability
 
   climate_projections:
     label: "Climate projections and seasonal forecasts"
@@ -282,20 +272,16 @@ themes:
       - longwave radiation
       - cloud cover
       - cloud fraction
-      - radiation budget
-      - TOA
       - albedo
       - sunshine
       - overcast
       - cloud properties
     description: >
-      Radiation and cloud products from ERA5 surface radiation fields,
-      satellite-derived cloud properties, and the Earth Radiation Budget
-      from satellite instruments.
+      Radiation and cloud products from ERA5 surface radiation fields and
+      satellite-derived cloud properties.
     use_cases:
       - surface_solar_radiation
       - cloud_properties
-      - earth_radiation_budget
 
 
 # ---------------------------------------------------------------------------
@@ -377,7 +363,7 @@ use_cases:
     theme: heat_stress
     typical_question: "What is the temperature at 5km resolution over complex terrain?"
     dataset: reanalysis_cerra_single_levels
-    subset: sfc
+    subset: analysis
     variable: t2m
     recommended_access: zarr
     recommended_aggregation: daily_max
@@ -486,8 +472,8 @@ use_cases:
     theme: air_quality
     typical_question: "What will PM2.5 and ozone be over the next 4 days?"
     dataset: cams_europe_air_quality_forecasts
-    subset: sfc
-    variable: pm2p5
+    subset: ens-sfc
+    variable: pm2p5_conc
     recommended_access: zarr
     recommended_aggregation: daily_max
     recommended_style: raw
@@ -496,7 +482,8 @@ use_cases:
     notes: >
       Forecast data extends up to 4 days ahead. Daily maximum is the
       operationally relevant statistic for EU Air Quality Directive
-      compliance and public health advisories.
+      compliance and public health advisories. The forecast store suffixes
+      every pollutant with _conc (o3_conc, no2_conc, pm10_conc, co_conc, so2_conc).
 
   # ---------- wildfire ------------------------------------------------------
 
@@ -505,8 +492,8 @@ use_cases:
     theme: wildfire
     typical_question: "Where is fire danger highest this fire season?"
     dataset: cems_fire_historical_v1
-    subset: sfc
-    variable: fwi
+    subset: canada-consolidated
+    variable: fwinx
     recommended_access: zarr
     recommended_aggregation: daily_max
     recommended_style: raw
@@ -516,32 +503,15 @@ use_cases:
       FWI > 50 is classified as extreme fire danger. The historical record
       from 1940 to present enables multi-decade trend analysis. Combine with
       satellite_lai_fapar for vegetation-weighted fire risk assessment.
-      Also available: ffmc, dmc, dc (fuel moisture), isi, bui, dsr.
-
-  fire_smoke_aerosol:
-    label: "Wildfire smoke and aerosol transport"
-    theme: wildfire
-    typical_question: "Where is wildfire smoke causing high aerosol loads?"
-    dataset: cams_global_atmospheric_composition_forecasts
-    subset: sfc
-    variable: aod550
-    recommended_access: zarr
-    recommended_aggregation: daily_mean
-    recommended_style: raw
-    typical_aoi_scale: continental
-    typical_time_window: "Active fire event (days to weeks)"
-    notes: >
-      AOD > 1.0 indicates dense smoke. Combine with CEMS FWI to identify
-      source regions. Global coverage at 0.4° allows tracking of transoceanic
-      smoke transport (e.g. Canadian fires reaching Europe).
+      Also available: ffmcode, dufmcode, drtcode (fuel moisture), infsinx, fbupinx, fdsrte.
 
   fire_season_trend:
     label: "Fire season danger trend — multi-decade"
     theme: wildfire
     typical_question: "Has fire danger increased over the past 30 years in this region?"
     dataset: cems_fire_historical_v1
-    subset: sfc
-    variable: fwi
+    subset: canada-consolidated
+    variable: fwinx
     recommended_access: zarr
     recommended_aggregation: annual_mean
     recommended_style: anomaly
@@ -559,7 +529,7 @@ use_cases:
     theme: ocean_and_water
     typical_question: "Where is sea surface temperature above historical norms?"
     dataset: satellite_sea_surface_temperature
-    subset: sst
+    subset: combined
     variable: analysed_sst
     recommended_access: zarr
     recommended_aggregation: monthly_mean
@@ -576,8 +546,8 @@ use_cases:
     theme: ocean_and_water
     typical_question: "How has sea surface height changed over the past decade?"
     dataset: reanalysis_oras5
-    subset: ocean
-    variable: zos
+    subset: consolidated
+    variable: sossheig
     recommended_access: zarr
     recommended_aggregation: annual_mean
     recommended_style: anomaly
@@ -585,15 +555,15 @@ use_cases:
     typical_time_window: "10+ years"
     notes: >
       ORAS5 at 0.25° monthly from 1958 to present. Also available: ocean
-      temperature (tos), salinity (sos), sea ice concentration (siconc).
-      Sea surface height (zos) is provided as anomaly relative to model mean.
+      temperature (sosstsst), salinity (sosaline), sea ice thickness (iicethic).
+      Sea surface height (sossheig) is provided as anomaly relative to model mean.
 
   soil_moisture_drought:
     label: "Soil moisture and agricultural drought monitoring"
     theme: ocean_and_water
     typical_question: "Which regions are experiencing soil moisture deficits this season?"
     dataset: satellite_soil_moisture
-    subset: combined
+    subset: cdr-ssm-combined-daily
     variable: sm
     recommended_access: zarr
     recommended_aggregation: monthly_mean
@@ -610,7 +580,7 @@ use_cases:
     theme: ocean_and_water
     typical_question: "Is this lake or reservoir at historically low levels?"
     dataset: satellite_lake_water_level
-    subset: lwl
+    subset: multi-track
     variable: water_surface_height_above_reference_datum
     recommended_access: zarr
     recommended_aggregation: raw
@@ -627,7 +597,7 @@ use_cases:
     theme: ocean_and_water
     typical_question: "When and where did a marine heatwave event occur?"
     dataset: satellite_sea_surface_temperature
-    subset: sst
+    subset: combined
     variable: analysed_sst
     recommended_access: zarr
     recommended_aggregation: daily_mean
@@ -646,8 +616,8 @@ use_cases:
     theme: agriculture_and_land
     typical_question: "What were the temperature and precipitation conditions for crops last growing season?"
     dataset: sis_agrometeorological_indicators
-    subset: agera5
-    variable: 2m_temp_mean
+    subset: all
+    variable: Temperature_Air_2m_Mean_24h
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: raw
@@ -663,7 +633,7 @@ use_cases:
     theme: agriculture_and_land
     typical_question: "When did the growing season start and how dense is the canopy?"
     dataset: satellite_lai_fapar
-    subset: biophysical
+    subset: sentinel-3
     variable: LAI
     recommended_access: zarr
     recommended_aggregation: raw
@@ -671,16 +641,17 @@ use_cases:
     typical_aoi_scale: regional
     typical_time_window: "Growing season"
     notes: >
-      10-day composites at 1 km resolution from 1981 to present.
-      LAI > 4 indicates dense canopy; < 1 indicates sparse or stressed
-      vegetation. Also available: FAPAR (photosynthetically active radiation).
+      10-day composites at 1 km resolution. Each subset is one sensor; the
+      Sentinel-3 record runs 2018 to present, and NOAA/SPOT/PROBA subsets
+      extend the CDR back to 1981. LAI > 4 indicates dense canopy; < 1 indicates
+      sparse or stressed vegetation. Also available: fAPAR.
 
   land_cover_change:
     label: "Land cover classification and change detection"
     theme: agriculture_and_land
     typical_question: "How has land cover changed between 2000 and 2020?"
     dataset: satellite_land_cover
-    subset: lc
+    subset: all
     variable: lccs_class
     recommended_access: zarr
     recommended_aggregation: raw
@@ -697,24 +668,27 @@ use_cases:
     theme: agriculture_and_land
     typical_question: "How does surface albedo vary seasonally across this region?"
     dataset: satellite_albedo
-    subset: albedo
-    variable: al_bb_dh
+    subset: sentinel-3
+    variable: AL_DH_BB
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: raw
     typical_aoi_scale: regional
     typical_time_window: "1 year"
     notes: >
-      Broadband directional hemispherical reflectance at 1 km, 10-day composites,
-      1981 to present. Used in surface energy balance models. Snow cover
-      significantly elevates albedo (0.7–0.9 vs 0.1–0.2 for bare soil).
+      AL_DH_BB is broadband (BB) directional-hemispherical (black-sky) reflectance
+      at 1 km, 10-day composites. Each subset is one sensor; the Sentinel-3 record
+      runs 2018 to present, and NOAA/SPOT/PROBA subsets extend the CDR back to 1981.
+      Used in surface energy balance models. Snow cover significantly elevates albedo
+      (0.7–0.9 vs 0.1–0.2 for bare soil). AL_BH_BB is the companion
+      bi-hemispherical (white-sky) albedo.
 
   agricultural_drought:
     label: "Agricultural drought — soil and vegetation combined"
     theme: agriculture_and_land
     typical_question: "Which agricultural zones are under drought stress this season?"
     dataset: satellite_soil_moisture
-    subset: combined
+    subset: cdr-ssm-combined-daily
     variable: sm
     fusion_dataset: satellite_lai_fapar
     fusion_variable: LAI
@@ -730,40 +704,6 @@ use_cases:
       signal indicates severe agricultural drought.
 
   # ---------- renewable_energy ----------------------------------------------
-
-  wind_capacity_factor:
-    label: "Onshore wind capacity factor — Europe"
-    theme: renewable_energy
-    typical_question: "Which areas have the best onshore wind resource for turbine siting?"
-    dataset: sis_energy_pecd
-    subset: energy
-    variable: wind_onshore_capacity_factor
-    recommended_access: zarr
-    recommended_aggregation: annual_mean
-    recommended_style: raw
-    typical_aoi_scale: country
-    typical_time_window: "10+ years"
-    notes: >
-      Capacity factor 0.0–1.0. Values above 0.35 are generally economically
-      viable for onshore wind. Hourly data from 1979 to present allows
-      interannual variability and P50/P90 exceedance analysis.
-
-  solar_pv_capacity_factor:
-    label: "Solar PV capacity factor — Europe"
-    theme: renewable_energy
-    typical_question: "Where is solar irradiance highest for PV installation?"
-    dataset: sis_energy_pecd
-    subset: energy
-    variable: solar_pv_capacity_factor
-    recommended_access: zarr
-    recommended_aggregation: annual_mean
-    recommended_style: raw
-    typical_aoi_scale: country
-    typical_time_window: "10+ years"
-    notes: >
-      Southern Europe (Spain, Italy, Greece) typically reaches 0.18–0.22 annual
-      capacity factor — significantly higher than northern latitudes (0.10–0.14).
-      Seasonal variation is large; summer peaks can reach 0.35+.
 
   offshore_wind_resource:
     label: "Offshore wind resource — 100m wind speed"
@@ -782,23 +722,6 @@ use_cases:
       u100 and v100 then compute wind speed as sqrt(u100² + v100²).
       The North Sea typically shows mean hub-height wind speeds of 10–12 m/s.
 
-  energy_seasonal_variability:
-    label: "Renewable energy seasonal variability"
-    theme: renewable_energy
-    typical_question: "How does wind and solar availability vary across the year?"
-    dataset: sis_energy_pecd
-    subset: energy
-    variable: wind_offshore_capacity_factor
-    recommended_access: zarr
-    recommended_aggregation: monthly_mean
-    recommended_style: raw
-    typical_aoi_scale: country
-    typical_time_window: "1+ years"
-    notes: >
-      Offshore wind peaks in winter; solar peaks in summer. The seasonal
-      complementarity between the two sources is critical for grid planning.
-      European offshore capacity factor is typically 0.40–0.55 in winter.
-
   # ---------- climate_projections -------------------------------------------
 
   temperature_projection:
@@ -806,7 +729,7 @@ use_cases:
     theme: climate_projections
     typical_question: "How much warmer will this region be by 2050 under RCP8.5?"
     dataset: projections_cordex_domains_single_levels
-    subset: sfc
+    subset: eur11-rcp85-day-ichec_ec_earth-knmi_racmo22e-r1i1p1
     variable: tas
     recommended_access: zarr
     recommended_aggregation: annual_mean
@@ -816,14 +739,16 @@ use_cases:
     notes: >
       CORDEX at 0.11°–0.44° resolution, 1950–2100. Subtract the historical
       baseline (1981–2010 mean) to produce a warming anomaly map.
-      Multiple models available — compute ensemble mean for robust estimate.
+      Each subset is one {domain}-{scenario}-{step}-{GCM}-{RCM}-{run} combination
+      (213 in total); the one named here is an EUR-11 RCP8.5 EC-EARTH / KNMI-RACMO22E
+      run. Iterate over subsets and average for a robust ensemble estimate.
 
   precipitation_projection:
     label: "Future precipitation change — CORDEX"
     theme: climate_projections
     typical_question: "Will this region become wetter or drier by mid-century?"
     dataset: projections_cordex_domains_single_levels
-    subset: sfc
+    subset: eur11-rcp85-day-ichec_ec_earth-knmi_racmo22e-r1i1p1
     variable: pr
     recommended_access: zarr
     recommended_aggregation: annual_mean
@@ -833,14 +758,15 @@ use_cases:
     notes: >
       Mediterranean regions show robust drying signals under RCP4.5 and RCP8.5.
       Northern Europe shows wetting signals. Express as percentage change from
-      the 1981–2010 baseline for communicability.
+      the 1981–2010 baseline for communicability. The subset named here is one
+      EUR-11 RCP8.5 run; swap it for other {GCM}-{RCM} subsets to build an ensemble.
 
   seasonal_temperature_forecast:
     label: "Seasonal temperature outlook — 3 months ahead"
     theme: climate_projections
     typical_question: "Will next summer be warmer than average?"
     dataset: seasonal_monthly_single_levels
-    subset: sfc
+    subset: ecmwf-51
     variable: t2m
     recommended_access: zarr
     recommended_aggregation: monthly_mean
@@ -857,15 +783,16 @@ use_cases:
     theme: climate_projections
     typical_question: "Is there elevated risk of drought or flooding next season?"
     dataset: seasonal_monthly_single_levels
-    subset: sfc
-    variable: tp
+    subset: ecmwf-51
+    variable: tprate
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: anomaly
     typical_aoi_scale: country
     typical_time_window: "Next 1–4 months"
     notes: >
-      Precipitation seasonal forecasts have lower skill than temperature
+      tprate is the total precipitation rate (m/s); multiply by the accumulation
+      period for a depth. Precipitation seasonal forecasts have lower skill than temperature
       forecasts but are informative in ENSO-active years.
       Useful for early-warning drought and flood preparedness planning.
 
@@ -910,7 +837,7 @@ use_cases:
     theme: climate_trend
     typical_question: "How has SST changed in this marine region over the past decade?"
     dataset: satellite_sea_surface_temperature
-    subset: sst
+    subset: combined
     variable: analysed_sst
     recommended_access: zarr
     recommended_aggregation: annual_mean
@@ -963,25 +890,26 @@ use_cases:
     theme: flood_risk
     typical_question: "Are extreme rainfall events becoming more frequent?"
     dataset: satellite_precipitation
-    subset: precip
-    variable: rr
+    subset: monthly-mean
+    variable: sat_gauge_precip
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: anomaly
     typical_aoi_scale: regional
     typical_time_window: "10+ years"
     notes: >
-      Satellite precipitation (GPCC-based) at 0.1° from 1983 to present.
-      Useful for regions with sparse rain gauge networks (tropics, ocean).
-      Combine with ERA5 for a multi-source precipitation assessment.
+      sat_gauge_precip is the satellite/GPCC gauge-corrected blend at 0.1°,
+      monthly means 1983–2023 (the daily-mean subset serves raw satellite_precip
+      and the shorter 'precip' field). Useful for regions with sparse rain gauge
+      networks (tropics, ocean). Combine with ERA5 for a multi-source assessment.
 
   satellite_precipitation:
     label: "Satellite-derived precipitation — global coverage"
     theme: flood_risk
     typical_question: "What was total rainfall in this tropical region last month?"
     dataset: satellite_precipitation
-    subset: precip
-    variable: rr
+    subset: monthly-mean
+    variable: sat_gauge_precip
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: raw
@@ -989,7 +917,8 @@ use_cases:
     typical_time_window: "1 month"
     notes: >
       Useful where ERA5 is uncertain due to sparse assimilated observations.
-      Covers global tropics and sub-tropics at 0.1° daily from 1983 to present.
+      Covers global tropics and sub-tropics at 0.1°, monthly 1983–2023. For daily
+      fields use the daily-mean subset (variable precip, 2000–2021).
 
   # ---------- radiation_and_clouds ------------------------------------------
 
@@ -1015,34 +944,20 @@ use_cases:
     theme: radiation_and_clouds
     typical_question: "How cloudy is this region and what types of clouds predominate?"
     dataset: satellite_cloud_properties
-    subset: cloud
-    variable: cfc
+    subset: icdr-slstr-s3ab-equal-angle
+    variable: cfc_day
     recommended_access: zarr
     recommended_aggregation: monthly_mean
     recommended_style: raw
     typical_aoi_scale: regional
     typical_time_window: "1 year"
     notes: >
-      Cloud fractional cover (cfc) ranges 0–1. Also available: cloud top
-      pressure (ctp), cloud top temperature (ctt), liquid and ice water path
-      (lwp, iwp). Monthly composites at 0.05° from 1982 to present.
-
-  earth_radiation_budget:
-    label: "Earth radiation budget — top of atmosphere"
-    theme: radiation_and_clouds
-    typical_question: "Is this region gaining or losing energy at the top of atmosphere?"
-    dataset: satellite_earth_radiation_budget
-    subset: erb
-    variable: toa_net_all_mon
-    recommended_access: zarr
-    recommended_aggregation: annual_mean
-    recommended_style: anomaly
-    typical_aoi_scale: global
-    typical_time_window: "Multi-year"
-    notes: >
-      Net TOA radiation = shortwave in minus longwave out. Positive means
-      energy gain (warming). The global mean is slightly positive due to
-      the greenhouse effect imbalance. Monthly at 1° from 1979 to present.
+      Daytime cloud fractional cover (cfc_day) ranges 0–1; cfc_night is the
+      night-time companion. Also available: cloud top pressure (ctp_day),
+      cloud top temperature (ctt_day), liquid and ice water path
+      (lwp_day, iwp_day). Each subset is one instrument record — the one named
+      here is SLSTR on Sentinel-3A/3B (2018 to present, 0.05°); tcdr-aatsr-envisat
+      and tcdr-atsr2-ers2 extend the record back to 1995.
 
 
 # ---------------------------------------------------------------------------
