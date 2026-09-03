@@ -141,60 +141,86 @@ def _fetch_json(url: str, timeout: int = 20) -> Any:
 _CATALOGUE_API = "https://cds.climate.copernicus.eu/api/catalogue/v1/collections"
 
 
-def _get_form_url(dataset_id: str) -> Optional[str]:
-    """Look up the form URL, first from the local snapshot then live from CDS."""
-    cds_id = dataset_id.replace("_", "-")
+@lru_cache(maxsize=64)
+def _fetch_live_links(cds_id: str) -> dict[str, str]:
+    """Fetch the current ``form``/``constraints`` link URLs for *cds_id* live from CDS.
 
-    # 1. Local snapshot (fast, no network)
+    The CDS catalogue rotates these to a new content-hashed filename
+    whenever a dataset's form or valid-combinations rules change. The old
+    hashed URL keeps serving (now stale) content instead of 404ing, so a
+    URL bundled in the snapshot can go silently out of date. Resolving
+    live is the only way to be sure it's current — this is cached per
+    dataset per process (via :func:`clear_form_cache`) so it costs one
+    extra request per dataset per session, not one per lookup.
+
+    Returns ``{}`` on any failure (offline, CDS unreachable, unknown id).
+    """
+    try:
+        data = _fetch_json(f"{_CATALOGUE_API}/{cds_id}", timeout=15)
+    except Exception as exc:
+        logger.debug("Live catalogue lookup failed for %s: %s", cds_id, exc)
+        return {}
+
+    links: dict[str, str] = {}
+    for link in data.get("links", []):
+        rel = link.get("rel")
+        href = link.get("href", "")
+        if not href:
+            continue
+        if rel == "form" or "form.json" in href:
+            links.setdefault("form", href)
+        elif rel == "constraints" or "constraints.json" in href:
+            links.setdefault("constraints", href)
+    return links
+
+
+def _snapshot_link(dataset_id: str, cds_id: str, rel: str) -> Optional[str]:
+    """Look up link relation *rel* for *dataset_id* in the bundled CDS snapshot."""
     try:
         from geobridge.modules.discover import _load_cds_snapshot
         snapshot = _load_cds_snapshot()
         entry = snapshot.get(cds_id) or snapshot.get(dataset_id)
         if entry:
-            url = (entry.get("links") or {}).get("form")
-            if url:
-                return url
+            return (entry.get("links") or {}).get(rel)
     except Exception:
         pass
+    return None
 
-    # 2. Live CDS catalogue API fallback (dataset not in bundled snapshot)
-    try:
-        collection_url = f"{_CATALOGUE_API}/{cds_id}"
-        data = _fetch_json(collection_url, timeout=15)
-        for link in data.get("links", []):
-            if link.get("rel") == "form" or "form.json" in link.get("href", ""):
-                return link["href"]
-    except Exception as exc:
-        logger.debug("Live form URL lookup failed for %s: %s", cds_id, exc)
+
+def _get_form_url(dataset_id: str) -> Optional[str]:
+    """Look up the form URL, live from CDS first, falling back to the bundled snapshot."""
+    cds_id = dataset_id.replace("_", "-")
+
+    # 1. Live CDS catalogue API — authoritative, always current.
+    url = _fetch_live_links(cds_id).get("form")
+    if url:
+        return url
+
+    # 2. Bundled snapshot fallback (offline / CDS unreachable / rate-limited).
+    url = _snapshot_link(dataset_id, cds_id, "form")
+    if url:
+        logger.debug("Using bundled snapshot form URL for %s (live lookup failed).", cds_id)
+        return url
 
     return None
 
 
 def _get_constraints_url(dataset_id: str) -> Optional[str]:
-    """Look up the constraints URL, first from the local snapshot then live from CDS."""
+    """Look up the constraints URL, live from CDS first, falling back to the bundled snapshot."""
     cds_id = dataset_id.replace("_", "-")
 
-    # 1. Local snapshot
-    try:
-        from geobridge.modules.discover import _load_cds_snapshot
-        snapshot = _load_cds_snapshot()
-        entry = snapshot.get(cds_id) or snapshot.get(dataset_id)
-        if entry:
-            url = (entry.get("links") or {}).get("constraints")
-            if url:
-                return url
-    except Exception:
-        pass
+    # 1. Live CDS catalogue API — authoritative, always current.
+    url = _fetch_live_links(cds_id).get("constraints")
+    if url:
+        return url
 
-    # 2. Live CDS catalogue API fallback
-    try:
-        collection_url = f"{_CATALOGUE_API}/{cds_id}"
-        data = _fetch_json(collection_url, timeout=15)
-        for link in data.get("links", []):
-            if link.get("rel") == "constraints" or "constraints.json" in link.get("href", ""):
-                return link["href"]
-    except Exception as exc:
-        logger.debug("Live constraints URL lookup failed for %s: %s", cds_id, exc)
+    # 2. Bundled snapshot fallback (offline / CDS unreachable / rate-limited).
+    url = _snapshot_link(dataset_id, cds_id, "constraints")
+    if url:
+        logger.debug(
+            "Using bundled snapshot constraints URL for %s (live lookup failed).", cds_id
+        )
+        return url
 
     return None
 
@@ -490,6 +516,7 @@ def validate_request(dataset_id: str, request: dict) -> list[str]:
 
 
 def clear_form_cache():
-    """Clear the in-memory form and constraints cache."""
+    """Clear the in-memory form, constraints, and live-link caches."""
     _FORM_CACHE.clear()
     _CONSTRAINTS_CACHE.clear()
+    _fetch_live_links.cache_clear()
