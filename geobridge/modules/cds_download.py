@@ -381,6 +381,18 @@ def _netcdf_to_geotiff(
                 ids.add(_norm(str(val)))
         return target in ids
 
+    def _display_name(var_name: str, da: xr.DataArray) -> str:
+        """Human-readable variable name for band labels.
+
+        CDS files store short names ('r', 't2m', 'z'); prefer the descriptive
+        ``long_name`` / ``standard_name`` attribute when present.
+        """
+        for key in ("long_name", "standard_name", "GRIB_name"):
+            val = da.attrs.get(key)
+            if val:
+                return str(val)
+        return var_name
+
     if variable and variable in ds:
         selected = [variable]
     elif variable and (hits := [v for v in data_vars if _matches(variable, v, ds[v])]):
@@ -436,7 +448,7 @@ def _netcdf_to_geotiff(
     labels: list[str] = []
     for v in selected:
         prepared = _prep_spatial(ds[v])
-        for label, band in _bands(str(v), prepared):
+        for label, band in _bands(_display_name(str(v), ds[v]), prepared):
             labels.append(label)
             bands.append(band.rename("band"))
 
