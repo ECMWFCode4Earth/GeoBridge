@@ -1544,32 +1544,6 @@ datasets:
       retrieve: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/projections-cordex-domains-single-levels
       costing_api: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/projections-cordex-domains-single-levels/costing
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/projections-cordex-domains-single-levels/layout_b9fc8ea84d2c1dca2f467d5144a758a7dcf5b3cf150c248a9f368c5c5cb39895.json
-  provider-c3s-data-rescue-without:
-    id: provider-c3s-data-rescue-without
-    title: Data Rescue Service from the Copernicus Climate Change Service
-    description: "The present Catalogue entry introduces the Data Rescue Service online portal which is\
-      \ run by a contract team coordinated by the Copernicus Climate Change Service (C3S). \nRegistration\
-      \ with, and login to, the C3S Data Rescue Service portal is independent of the present C3S Climate\
-      \ Data Store catalogue. \nData rescue is the discovery, preservation, quality control, digitisation\
-      \ and consolidation of past measurements of weather conditions.\nThe C3S Data Rescue Service does\
-      \ not provide rescued data - that data is sent to international repositories.\nThe C3S Data Rescue\
-      \ Service facilitates and …"
-    service: C3S
-    keywords: []
-    license: other
-    providers: []
-    spatial_bbox:
-    - -180.0
-    - -90.0
-    - 180.0
-    - 90.0
-    temporal_interval:
-    - null
-    - null
-    thumbnail: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/provider-c3s-data-rescue-without/overview_bc1f17dfea0ff77a9f510573e6003e9f1527081e6d59ff4a419aa8885cbeeb73.png
-    links:
-      retrieve: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/provider-c3s-data-rescue-without
-      layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/provider-c3s-data-rescue-without/layout_cf0f69f0403687836ad68dda207c3d7fc66133c365eeb45458cdd6df16b7aa5d.json
   reanalysis-carra-height-levels:
     id: reanalysis-carra-height-levels
     title: Arctic regional reanalysis on height levels from 1991 to present
