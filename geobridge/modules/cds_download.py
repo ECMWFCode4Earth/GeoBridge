@@ -58,6 +58,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -257,22 +258,26 @@ def _sniff_format(path: Path) -> str:
     return "unknown"
 
 
-def _open_result_dataset(path: Path):
-    """Open a downloaded CDS result as a single xarray Dataset.
+def _open_result_datasets(path: Path) -> list:
+    """Open a downloaded CDS result as a list of xarray Datasets.
 
-    Handles NetCDF, GRIB, and ZIP-of-files (each member opened and merged).
+    Handles NetCDF, GRIB, and ZIP-of-files.  ZIP members are returned as
+    separate datasets rather than merged: CDS packs structurally different
+    products (e.g. hourly values + monthly statistics) into one ZIP, and
+    merging them would union their mismatched ``time`` axes and NaN-pad
+    every grid.  The caller turns each dataset's grid variables into bands.
     """
     import xarray as xr
 
     fmt = _sniff_format(path)
 
     if fmt == "netcdf":
-        return xr.open_dataset(path, engine="netcdf4")
+        return [xr.open_dataset(path, engine="netcdf4")]
 
     if fmt == "grib":
         try:
-            return xr.open_dataset(path, engine="cfgrib")
-        except (ImportError, ValueError) as exc:
+            return [xr.open_dataset(path, engine="cfgrib")]
+        except (ImportError, ValueError, ModuleNotFoundError) as exc:
             raise CdsApiError(
                 "The CDS API returned a GRIB file but cfgrib is not "
                 "available to read it.\n"
@@ -298,22 +303,65 @@ def _open_result_dataset(path: Path):
                 f"{[p.name for p in extract_dir.rglob('*')]}"
             )
 
-        datasets = [_open_result_dataset(m) for m in members]
-        try:
-            return xr.merge(datasets, compat="override", combine_attrs="override")
-        except Exception:
-            # Fall back to the first member if the streams don't align
-            logger.warning(
-                "Could not merge %d ZIP members; using only %s",
-                len(members), members[0].name,
-            )
-            return datasets[0]
+        datasets: list = []
+        for m in members:
+            datasets.extend(_open_result_datasets(m))
+        return datasets
 
+    with open(path, "rb") as fh:
+        head = fh.read(8)
     raise CdsApiError(
         f"Downloaded file {path.name} is not a recognised format "
-        f"(first bytes: {open(path, 'rb').read(8)!r}). "
+        f"(first bytes: {head!r}). "
         "The CDS API may have returned an error page instead of data."
     )
+
+
+# Dimension-name pieces that identify a latitude / longitude axis. Bare
+# "y"/"x" are matched exactly only (see _find), never as substrings.
+_LAT_TOKENS = ("latitude", "lat", "rlat", "grid_latitude", "nav_lat")
+_LON_TOKENS = ("longitude", "lon", "rlon", "grid_longitude", "nav_lon")
+
+
+def _spatial_dims(da) -> Optional[tuple[str, str]]:
+    """Return ``(lat_dim, lon_dim)`` for a DataArray, or None if it is not a grid.
+
+    Tries dimension names first (``lat``/``latitude``/``rlat``/``y``/…), then
+    falls back to each dimension coordinate's ``standard_name`` / ``axis``
+    attribute.  Returns None for bounds variables, scalar values, and 1-D
+    time series that cannot be rasterised.
+    """
+    def _find(tokens: tuple, exact: tuple) -> Optional[str]:
+        for d in da.dims:
+            dl = str(d).lower()
+            if dl in exact or dl in tokens:
+                return d
+        for d in da.dims:
+            dl = str(d).lower()
+            if any(t in dl for t in tokens):
+                return d
+        return None
+
+    lat = _find(_LAT_TOKENS, ("y",))
+    lon = _find(_LON_TOKENS, ("x",))
+
+    if lat is None or lon is None:
+        for name, coord in da.coords.items():
+            if name not in da.dims:
+                continue
+            sn = str(coord.attrs.get("standard_name", "")).lower()
+            axis = str(coord.attrs.get("axis", "")).lower()
+            units = str(coord.attrs.get("units", "")).lower()
+            if lat is None and (sn in ("latitude", "grid_latitude")
+                                or axis == "y" or units.startswith("degrees_n")):
+                lat = name
+            if lon is None and (sn in ("longitude", "grid_longitude")
+                                or axis == "x" or units.startswith("degrees_e")):
+                lon = name
+
+    if lat is not None and lon is not None and lat != lon:
+        return lat, lon
+    return None
 
 
 def _fmt_coord(value: Any) -> str:
@@ -360,17 +408,15 @@ def _netcdf_to_geotiff(
     if reduce not in ("stack", "mean"):
         raise ValueError(f"reduce must be 'stack' or 'mean', got {reduce!r}")
 
-    ds = _open_result_dataset(nc_path)
-
-    data_vars = list(ds.data_vars)
-    if not data_vars:
-        raise ValueError(f"No data variables found in {nc_path}")
+    datasets = _open_result_datasets(nc_path)
 
     # Resolve the requested variable against the file. CDS NetCDF uses short
     # names ('sp', 'tp', 't2m') while requests use long names
     # ('surface_pressure', ...), so also match on the variables' attributes.
     def _norm(s: str) -> str:
-        return s.lower().replace(" ", "_")
+        # Collapse any run of non-alphanumerics to a single underscore so
+        # "Leaf area index, high vegetation" == "leaf_area_index_high_vegetation".
+        return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")
 
     def _matches(want: str, var_name: str, da: xr.DataArray) -> bool:
         target = _norm(want)
@@ -393,33 +439,51 @@ def _netcdf_to_geotiff(
                 return str(val)
         return var_name
 
-    if variable and variable in ds:
-        selected = [variable]
-    elif variable and (hits := [v for v in data_vars if _matches(variable, v, ds[v])]):
-        selected = hits
-    else:
-        if variable:
+    # Collect every grid variable across all downloaded files. Non-grid
+    # variables (bounds, scalar statistics, 1-D time series) are skipped —
+    # they cannot be rasterised.
+    candidates: list = []          # (var_name, DataArray, (lat_dim, lon_dim))
+    skipped: list = []             # (var_name, dims)
+    for d in datasets:
+        for name, da in d.data_vars.items():
+            sp = _spatial_dims(da)
+            if sp is None:
+                skipped.append((str(name), tuple(str(x) for x in da.dims)))
+                continue
+            candidates.append((str(name), da, sp))
+
+    if not candidates:
+        raise CdsApiError(
+            "None of the downloaded variables are lat/lon grids that can be "
+            f"written to GeoTIFF. Variables found: "
+            f"{['%s%s' % (n, dims) for n, dims in skipped]}"
+        )
+    if skipped:
+        logger.info(
+            "Skipping non-grid variables: %s",
+            ", ".join(f"{n}{dims}" for n, dims in skipped),
+        )
+
+    # Narrow to the requested variable when it matches at least one grid var.
+    if variable:
+        matched = [
+            c for c in candidates
+            if c[0] == variable or _matches(variable, c[0], c[1])
+        ]
+        if matched:
+            candidates = matched
+        elif len(candidates) == 1:
+            # The file holds exactly one grid variable; it must be the one
+            # that was requested even though the names don't line up.
+            logger.info(
+                "Requested variable '%s' stored as '%s' in the downloaded file.",
+                variable, candidates[0][0],
+            )
+        else:
             logger.warning(
-                "Variable '%s' not in file. Writing all %d variables as bands. "
-                "Available: %s", variable, len(data_vars), data_vars,
+                "Variable '%s' not found among grid variables %s — writing all.",
+                variable, [c[0] for c in candidates],
             )
-        selected = data_vars
-
-    def _prep_spatial(da: xr.DataArray) -> xr.DataArray:
-        # Detect and rename spatial dimensions
-        lat_names = [d for d in da.dims if "lat" in d.lower()]
-        lon_names = [d for d in da.dims if "lon" in d.lower()]
-        if lat_names and lat_names[0] != "y":
-            da = da.rename({lat_names[0]: "y", lon_names[0]: "x"})
-
-        # Spatial subset
-        if bbox:
-            west, south, east, north = bbox
-            da = da.sel(
-                y=slice(north, south) if da.y[0] > da.y[-1] else slice(south, north),
-                x=slice(west, east),
-            )
-        return da
 
     def _bands(name: str, da: xr.DataArray):
         """Yield (label, 2-D DataArray) pairs for one variable."""
@@ -446,16 +510,57 @@ def _netcdf_to_geotiff(
 
     bands: list = []
     labels: list[str] = []
-    for v in selected:
-        prepared = _prep_spatial(ds[v])
-        for label, band in _bands(_display_name(str(v), ds[v]), prepared):
+    for name, raw, (lat_dim, lon_dim) in candidates:
+        da = raw.rename({lat_dim: "y", lon_dim: "x"})
+
+        # A regular lat/lon grid has 1-D coordinate values on both axes.
+        # Projected / curvilinear grids (CERRA and other regional reanalyses
+        # on Lambert, polar-stereographic, … grids) arrive with bare y/x
+        # dimensions plus 2-D lat/lon arrays — geobridge cannot turn those
+        # into a georeferenced GeoTIFF, so fail loudly rather than write an
+        # un-georeferenced raster.
+        if "y" not in da.coords or "x" not in da.coords or da["y"].ndim != 1:
+            grid_type = raw.attrs.get("GRIB_gridType", "unknown")
+            raise CdsApiError(
+                f"'{name}' is on a projected or curvilinear grid "
+                f"(GRIB_gridType={grid_type!r}). geobridge only converts "
+                "datasets on a regular latitude/longitude grid to GeoTIFF; "
+                "regional reanalyses such as CERRA (Lambert Conformal) are "
+                "not supported by this path."
+            )
+
+        if bbox:
+            west, south, east, north = bbox
+            descending = float(da.y[0]) > float(da.y[-1])
+            da = da.sel(
+                y=slice(north, south) if descending else slice(south, north),
+                x=slice(west, east),
+            )
+            if da.sizes.get("y", 0) == 0 or da.sizes.get("x", 0) == 0:
+                raise CdsApiError(
+                    f"Spatial subset {bbox} selects no data from '{name}'. "
+                    "bbox must be (west, south, east, north) and overlap the "
+                    "request area."
+                )
+
+        for label, band in _bands(_display_name(name, da), da):
             labels.append(label)
             bands.append(band.rename("band"))
 
     if len(bands) == 1:
         da = bands[0]
     else:
-        da = xr.concat(bands, dim="band")
+        ref = bands[0]
+        if any(b.sizes != ref.sizes for b in bands[1:]):
+            logger.warning(
+                "Downloaded files have different grids; aligning all bands "
+                "to '%s' by nearest neighbour.", labels[0],
+            )
+            bands = [ref] + [
+                b.reindex(y=ref["y"], x=ref["x"], method="nearest")
+                for b in bands[1:]
+            ]
+        da = xr.concat(bands, dim="band", combine_attrs="drop_conflicts")
         da = da.assign_coords(band=range(1, len(bands) + 1))
     # rioxarray writes this as per-band descriptions (GDAL band metadata)
     da.attrs["long_name"] = tuple(labels)
