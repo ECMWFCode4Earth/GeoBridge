@@ -14,7 +14,10 @@ What it does
    capture link relations (form, constraints, related, retrieve URL).
 3. Extracts only the fields GeoBridge needs and writes a clean YAML
    snapshot to geobridge/semantic/cds_snapshot.yaml.
-4. Prints a diff summary against the previous snapshot so the maintainer
+4. Carries forward hand-curated fields (PRESERVED_FIELDS, e.g.
+   ``cds_download_supported``) from the previous snapshot so a refresh
+   never wipes them.
+5. Prints a diff summary against the previous snapshot so the maintainer
    knows whether the change is worth committing.
 
 When to run it
@@ -76,6 +79,13 @@ MAX_RELATED_LINKS = 10
 # Link relations we care about. Anything else is dropped from the snapshot.
 KEPT_LINK_RELS = {"form", "constraints", "retrieve", "costing_api",
                   "layout", "related", "qa", "license"}
+
+# Fields that are curated by hand in the snapshot (not derived from STAC) and
+# must survive a refresh.  Copied from the previous snapshot onto matching
+# dataset ids; new datasets get the default.
+PRESERVED_FIELDS: dict[str, Any] = {
+    "cds_download_supported": False,
+}
 
 logger = logging.getLogger("refresh_catalogue")
 
@@ -207,6 +217,9 @@ def _summarise_collection(collection: dict, detail: Optional[dict]) -> dict:
 
     summary = {
         "id": src["id"],
+        # Hand-curated fields — defaults here, real values merged from the
+        # previous snapshot in _carry_forward_preserved_fields().
+        **PRESERVED_FIELDS,
         "title": src.get("title", "").strip(),
         "description": _truncate_description(chosen_desc),
         "service": _service_from_keywords(src.get("keywords", [])),
@@ -226,6 +239,36 @@ def _summarise_collection(collection: dict, detail: Optional[dict]) -> dict:
 # ---------------------------------------------------------------------------
 # Snapshot writing
 # ---------------------------------------------------------------------------
+
+def _carry_forward_preserved_fields(entries: list[dict], old_path: Path) -> int:
+    """Copy hand-curated :data:`PRESERVED_FIELDS` from the previous snapshot.
+
+    Modifies *entries* in place.  Returns the number of (entry, field) values
+    carried over so the maintainer can sanity-check nothing was lost.
+    """
+    if not old_path.exists():
+        return 0
+    try:
+        import yaml
+    except ImportError:
+        logger.warning("PyYAML missing — cannot carry forward curated fields.")
+        return 0
+
+    with old_path.open(encoding="utf-8") as fp:
+        old = yaml.safe_load(fp) or {}
+    old_datasets = old.get("datasets") or {}
+
+    carried = 0
+    for entry in entries:
+        prev = old_datasets.get(entry["id"])
+        if not prev:
+            continue
+        for field_name, default in PRESERVED_FIELDS.items():
+            if field_name in prev and prev[field_name] != default:
+                entry[field_name] = prev[field_name]
+                carried += 1
+    return carried
+
 
 def _write_snapshot(entries: list[dict], output_path: Path) -> None:
     """Write the snapshot to *output_path* in stable YAML."""
@@ -354,10 +397,14 @@ def main() -> int:
         if i % 20 == 0:
             logger.info("  processed %d / %d", i, len(collections))
 
-    logger.info("Step 3: diff against previous snapshot")
+    logger.info("Step 3: carry forward hand-curated fields")
+    carried = _carry_forward_preserved_fields(summarised, args.output)
+    logger.info("  carried forward %d curated field value(s)", carried)
+
+    logger.info("Step 4: diff against previous snapshot")
     print("\nDiff summary:\n" + _summarise_diff(args.output, summarised) + "\n")
 
-    logger.info("Step 4: write snapshot")
+    logger.info("Step 5: write snapshot")
     _write_snapshot(summarised, args.output)
 
     print("\nDone.  Review changes with:")

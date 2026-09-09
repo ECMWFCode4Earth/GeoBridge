@@ -607,6 +607,7 @@ def cds_to_geotiff(
     progress_callback=None,
     cog: bool = True,
     reduce: str = "stack",
+    allow_unsupported: bool = False,
 ) -> Path:
     """Download a dataset from the CDS API and convert to GeoTIFF.
 
@@ -643,6 +644,14 @@ def cds_to_geotiff(
         How to handle non-spatial dimensions (time, level, ensemble number).
         ``"stack"`` (default) writes one band per (variable, time, level, …)
         combination; ``"mean"`` averages them into one band per variable.
+    allow_unsupported : bool
+        geobridge is a prototype: the CDS download path has only been
+        validated for the datasets flagged ``cds_download_supported: true``
+        in the catalogue snapshot.  For any other dataset this function
+        raises :class:`CdsApiError` before submitting.  Pass
+        ``allow_unsupported=True`` to try it anyway — and if the result is
+        correct, set that flag for the dataset in
+        ``geobridge/semantic/cds_snapshot.yaml``.
 
     Returns
     -------
@@ -673,6 +682,24 @@ def cds_to_geotiff(
     ... )
     """
     import tempfile
+
+    # Gate on the curated support list — geobridge only claims correctness
+    # for datasets validated end to end.
+    if not allow_unsupported:
+        try:
+            from geobridge.modules.discover import discover_one
+            desc = discover_one(dataset)
+        except Exception:  # pragma: no cover - discovery is best-effort here
+            desc = None
+        if desc is not None and desc.has_cds_retrieve and not desc.cds_download_supported:
+            raise CdsApiError(
+                f"'{dataset}' is not on geobridge's validated cds_to_geotiff list.\n"
+                "geobridge is a prototype; only a few CDS datasets are confirmed to "
+                "convert correctly (see gb.discover(cds_download_only=True)).\n\n"
+                "To try this dataset anyway, pass allow_unsupported=True. If the "
+                "GeoTIFF is correct, set 'cds_download_supported: true' for it in "
+                "geobridge/semantic/cds_snapshot.yaml."
+            )
 
     # Ensure data_format is set
     if "data_format" not in request:

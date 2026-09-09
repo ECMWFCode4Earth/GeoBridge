@@ -25,7 +25,11 @@ The library is the foundation for the project's QGIS plugin.
   `gb.list_variables()` enumerate what's available through this path.
 - **Extraction — CDS API path.** `gb.cds_to_geotiff()` submits a download job
   through the standard CDS API for datasets that are not yet in the ARCO lake,
-  converts the result to GeoTIFF, and streams it to disk.
+  converts the result to GeoTIFF, and streams it to disk. As a prototype this
+  path is only validated for a curated set of datasets
+  (`gb.discover(cds_download_only=True)`, or the `cds_download_supported` flag
+  in `cds_snapshot.yaml`); other datasets raise unless you pass
+  `allow_unsupported=True`.
 - **WMTS.** `gb.wmts_layer()` returns a ready-to-use WMTS layer object for
   live tile streaming inside QGIS.
 - **Time series.** `gb.point_time_series()` and `gb.point_value()` sample a

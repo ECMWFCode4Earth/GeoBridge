@@ -123,6 +123,7 @@ class LayerDescriptor:
     cds_retrieve_url: Optional[str] = None
     cds_form_url: Optional[str] = None          # CDS form schema JSON URL
     cds_constraints_url: Optional[str] = None   # CDS constraints JSON URL
+    cds_download_supported: bool = False        # confirmed to convert via gb.cds_to_geotiff()
 
     # Styling hint
     colormap: dict = field(default_factory=dict)
@@ -211,6 +212,7 @@ class LayerDescriptor:
                 "has_zarr": self.has_zarr,
                 "has_wmts": self.has_wmts,
                 "has_cds_retrieve": self.has_cds_retrieve,
+                "cds_download_supported": self.cds_download_supported,
                 "extraction_supported": self.extraction_supported,
             },
             "colormap": self.colormap,
@@ -220,7 +222,8 @@ class LayerDescriptor:
         access = []
         if self.has_zarr:         access.append("zarr")
         if self.has_wmts:         access.append("wmts")
-        if self.has_cds_retrieve: access.append("cds")
+        if self.has_cds_retrieve:
+            access.append("cds" if self.cds_download_supported else "cds?")
         return (
             f"LayerDescriptor(id={self.id!r}, service={self.service!r}, "
             f"access={access or ['metadata-only']})"
@@ -438,6 +441,9 @@ def _descriptor_from_arco(dataset_id: str, arco_entry: dict,
     if cds_entry:
         keywords = cds_entry.get("keywords", []) or []
 
+    cds_download_supported = bool(
+        cds_entry.get("cds_download_supported")) if cds_entry else False
+
     # Colormap from the first variable's metadata, or fallback
     colormap = dict(_DEFAULT_COLORMAP)
     if variables:
@@ -470,6 +476,7 @@ def _descriptor_from_arco(dataset_id: str, arco_entry: dict,
         cds_retrieve_url=cds_retrieve,
         cds_form_url=cds_form,
         cds_constraints_url=cds_constraints,
+        cds_download_supported=cds_download_supported,
         colormap=colormap,
     )
 
@@ -509,6 +516,7 @@ def _descriptor_from_cds_only(dataset_id: str, cds_entry: dict) -> LayerDescript
         cds_retrieve_url=cds_retrieve,
         cds_form_url=cds_form,
         cds_constraints_url=cds_constraints,
+        cds_download_supported=bool(cds_entry.get("cds_download_supported")),
         colormap=dict(_DEFAULT_COLORMAP),
     )
 
@@ -555,6 +563,7 @@ def discover(
     time_after: Optional[datetime] = None,
     extraction_only: bool = False,
     arco_only: bool = False,
+    cds_download_only: bool = False,
 ) -> list[LayerDescriptor]:
     """Return Copernicus datasets matching the given filters.
 
@@ -584,6 +593,11 @@ def discover(
         When True, return only datasets available in the ARCO Zarr store
         (``has_zarr=True``). These support fast synchronous extraction via
         ``gb.zarr_to_geotiff()``. Currently 26 datasets.
+    cds_download_only : bool
+        When True, return only datasets confirmed to convert correctly via
+        ``gb.cds_to_geotiff()`` (``cds_download_supported: true`` in the
+        catalogue snapshot).  geobridge is a prototype — this list is short
+        and grows as datasets are validated.
 
     Returns
     -------
@@ -642,6 +656,7 @@ def discover(
         if time_after and not _matches_time(desc, time_after): continue
         if extraction_only and not desc.extraction_supported:  continue
         if arco_only and not desc.has_zarr:                    continue
+        if cds_download_only and not desc.cds_download_supported: continue
         results.append(desc)
 
     results.sort(key=lambda d: d.id)

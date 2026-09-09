@@ -6,6 +6,7 @@ _meta:
 datasets:
   derived-drought-historical-monthly:
     id: derived-drought-historical-monthly
+    cds_download_supported: false
     title: Monthly drought indices from 1940 to present derived from ERA5 reanalysis
     description: 'ERA5–Drought is a global reconstruction of drought indices from 1940 to present.
 
@@ -49,6 +50,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/derived-drought-historical-monthly/layout_1965dd8e665a16c44fc6a699a37d24f1970d8b203841dd51051059d5928d09ae.json
   derived-era5-land-daily-statistics:
     id: derived-era5-land-daily-statistics
+    cds_download_supported: true
     title: ERA5-Land post-processed daily statistics from 1950 to present
     description: "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land\
       \ variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been\
@@ -94,6 +96,7 @@ datasets:
         title: ERA5-Land monthly averaged data from 1950 to present
   derived-era5-pressure-levels-daily-statistics:
     id: derived-era5-pressure-levels-daily-statistics
+    cds_download_supported: true
     title: ERA5 post-processed daily statistics on pressure levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -155,6 +158,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   derived-era5-single-levels-daily-statistics:
     id: derived-era5-single-levels-daily-statistics
+    cds_download_supported: false
     title: ERA5 post-processed daily statistics on single levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -218,6 +222,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   derived-gridded-glacier-mass-change:
     id: derived-gridded-glacier-mass-change
+    cds_download_supported: false
     title: Glacier mass change gridded data from 1976 to present derived from the Fluctuations of Glaciers
       Database
     description: The dataset provides global annual glacier mass changes distributed on a global regular
@@ -259,6 +264,7 @@ datasets:
         title: Glaciers distribution data from the Randolph Glacier Inventory for year 2000
   derived-near-surface-meteorological-variables:
     id: derived-near-surface-meteorological-variables
+    cds_download_supported: false
     title: Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis
     description: "This dataset provides bias-corrected reconstruction of near-surface meteorological variables\
       \ derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF)\
@@ -294,6 +300,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/derived-near-surface-meteorological-variables/layout_59791322b7d2ae6511b94d599eca9317097d6d10d383aa63380292e4fd6f0954.json
   derived-reanalysis-energy-moisture-budget:
     id: derived-reanalysis-energy-moisture-budget
+    cds_download_supported: false
     title: Mass-consistent atmospheric energy and moisture budget monthly data from 1979 to present derived
       from ERA5 reanalysis
     description: "This dataset provides monthly means of mass-consistent, vertically integrated, atmospheric\
@@ -352,6 +359,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   derived-utci-historical:
     id: derived-utci-historical
+    cds_download_supported: true
     title: Thermal comfort indices derived from ERA5 reanalysis
     description: 'This dataset provides a complete historical reconstruction for a set of indices representing
       human thermal stress and discomfort in outdoor conditions. This dataset, also known as ERA5-HEAT
@@ -417,6 +425,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   derived-utci-historical-timeseries:
     id: derived-utci-historical-timeseries
+    cds_download_supported: false
     title: Thermal comfort indices time-series derived from ERA5 reanalysis
     description: 'This catalogue entry provides a time series of thermal comfort indices, organised to
       make time the primary dimension for analysis and extraction. For any user-defined location (point)
@@ -461,6 +470,7 @@ datasets:
         title: Thermal comfort indices derived from ERA5 reanalysis
   ecv-for-climate-change:
     id: ecv-for-climate-change
+    cds_download_supported: false
     title: Essential climate variables for assessment of climate variability from 1979 to present
     description: The Essential Climate Variables for assessment of climate variability from 1979 to present
       dataset contains a selection of climatologies, monthly anomalies and monthly mean fields of Essential
@@ -498,6 +508,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/ecv-for-climate-change/layout_34e511836bdace4c481d487a4d911ef89951fd577f45675781f0298ebc912d81.json
   insitu-comprehensive-upper-air-observation-network:
     id: insitu-comprehensive-upper-air-observation-network
+    cds_download_supported: false
     title: Comprehensive Upper-air Observation Network from 1901 to present
     description: "The Comprehensive Upper-air Observation Network (CUON) dataset is designed \nto contain\
       \ all available observations from balloons ascents through the atmosphere. \nThe main geophysical\
@@ -547,6 +558,7 @@ datasets:
           and Ultraviolet Radiation Data Centre
   insitu-glaciers-extent:
     id: insitu-glaciers-extent
+    cds_download_supported: false
     title: Glaciers distribution data from the Randolph Glacier Inventory for year 2000
     description: 'This dataset, commonly known as the Randolph Glacier Inventory (RGI), provides global
       glacier outlines compiled from maps, aerial photographs and satellite images. The data is provided
@@ -590,6 +602,7 @@ datasets:
           Glaciers Database
   insitu-gridded-observations-alpine-precipitation:
     id: insitu-gridded-observations-alpine-precipitation
+    cds_download_supported: false
     title: Alpine gridded monthly precipitation data since 1871 derived from in-situ observations
     description: "This dataset, also known as the Long-term Alpine Precipitation Reconstruction (LAPrec),\
       \ provides gridded fields of monthly precipitation for the Alpine region (eight countries). The\
@@ -630,6 +643,7 @@ datasets:
           observations
   insitu-gridded-observations-europe:
     id: insitu-gridded-observations-europe
+    cds_download_supported: false
     title: E-OBS daily gridded meteorological data for Europe from 1950 to present derived from in-situ
       observations
     description: E-OBS is a daily gridded land-only observational dataset over Europe. The blended time
@@ -673,6 +687,7 @@ datasets:
         title: Alpine gridded monthly precipitation data since 1871 derived from in-situ observations
   insitu-gridded-observations-global-and-regional:
     id: insitu-gridded-observations-global-and-regional
+    cds_download_supported: false
     title: Temperature and precipitation gridded data for global and regional domains derived from in-situ
       and satellite observations
     description: 'This dataset provides high-resolution gridded temperature and precipitation observations
@@ -721,6 +736,7 @@ datasets:
         title: Upper tropospheric humidity gridded data derived from satellite observations
   insitu-gridded-observations-nordic:
     id: insitu-gridded-observations-nordic
+    cds_download_supported: false
     title: Nordic gridded temperature and precipitation data from 1961 to present derived from in-situ
       observations
     description: "The Nordic Gridded Climate Dataset (NGCD) is a high resolution, observational, gridded\
@@ -761,6 +777,7 @@ datasets:
         title: Alpine gridded monthly precipitation data since 1871 derived from in-situ observations
   insitu-observations-gnss:
     id: insitu-observations-gnss
+    cds_download_supported: false
     title: In-situ observations of water vapour and atmospheric delay from the ground-based GNSS network
       from 1996 to present
     description: "This dataset provides estimates of water vapour derived from atmospheric delays in Global\
@@ -799,6 +816,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/insitu-observations-gnss/layout_90b974685c7a894363231e92c9d3b000cd53cc85b696206b30656637e0773b31.json
   insitu-observations-gruan-reference-network:
     id: insitu-observations-gruan-reference-network
+    cds_download_supported: false
     title: In situ temperature, relative humidity and wind profiles from 2006 to March 2020 from the GRUAN
       reference network
     description: The Global Climate Observing System (GCOS) Reference Upper-Air Network (GRUAN) is an
@@ -848,6 +866,7 @@ datasets:
           and Ultraviolet Radiation Data Centre
   insitu-observations-igra-baseline-network:
     id: insitu-observations-igra-baseline-network
+    cds_download_supported: false
     title: In situ observations of meteorological variables from the Integrated Global Radiosounding Archive
       and the Radiosounding Harmonization dataset from 1978 onward
     description: "This catalogue entry provides access to vertical profiles of standard meteorological\
@@ -897,6 +916,7 @@ datasets:
           and Ultraviolet Radiation Data Centre
   insitu-observations-near-surface-temperature-us-climate-reference-network:
     id: insitu-observations-near-surface-temperature-us-climate-reference-network
+    cds_download_supported: false
     title: In situ observations of meteorological and soil variables from the US Climate Reference Network
       near the surface from 2006 to present
     description: "This catalogue entry provides access to a continuous series of near-surface climate\
@@ -948,6 +968,7 @@ datasets:
         title: Gridded dataset underpinning the Copernicus Interactive Climate Atlas
   insitu-observations-surface-land:
     id: insitu-observations-surface-land
+    cds_download_supported: false
     title: Global land surface atmospheric variables from 1755 to present from comprehensive in-situ observations
     description: 'This set of data holdings provides access to data collected from land surface meteorological
       observations across the globe. Data are available at the observational level and also at daily and
@@ -992,6 +1013,7 @@ datasets:
           in-situ observations
   insitu-observations-surface-marine:
     id: insitu-observations-surface-marine
+    cds_download_supported: false
     title: Global marine surface meteorological variables from 1850 to present from comprehensive in-situ
       observations
     description: "This set of holdings provides access to surface marine meteorological weather reports\
@@ -1030,6 +1052,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/insitu-observations-surface-marine/layout_91dece8c96307e68db67838d7428d57d6a499380caec9a9d7063bde52530e1d0.json
   insitu-observations-woudc-ozone-total-column-and-profiles:
     id: insitu-observations-woudc-ozone-total-column-and-profiles
+    cds_download_supported: false
     title: In situ total column ozone and ozone soundings from 1924 to present from the World Ozone and
       Ultraviolet Radiation Data Centre
     description: 'This dataset provides access to two types of ozone observations: total column ozone
@@ -1074,6 +1097,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/insitu-observations-woudc-ozone-total-column-and-profiles/layout_fb5f4dbc60a5b9af602004513983fb452813192bd42331c8679a4722d0a94838.json
   multi-origin-c3s-atlas:
     id: multi-origin-c3s-atlas
+    cds_download_supported: false
     title: Gridded dataset underpinning the Copernicus Interactive Climate Atlas
     description: This catalogue entry provides the gridded climate data (monthly/annual timeseries) used
       for the Copernicus Climate Change Service Atlas (C3S Atlas). The gridded datasets consist of in-situ
@@ -1120,6 +1144,7 @@ datasets:
         title: CMIP6 climate projections
   projections-climate-atlas:
     id: projections-climate-atlas
+    cds_download_supported: false
     title: Gridded monthly climate projection dataset underpinning the IPCC AR6 Interactive Atlas
     description: This catalogue entry provides gridded data from global (CMIP5 and CMIP6) and regional
       (CORDEX) projections for the set of 22 variables and indices included in the IPCC Interactive Atlas,
@@ -1173,6 +1198,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cmip5-daily-pressure-levels:
     id: projections-cmip5-daily-pressure-levels
+    cds_download_supported: false
     title: CMIP5 daily data on pressure levels
     description: 'This catalogue entry provides daily climate projections on pressure levels from a large
       number of experiments, models, members and time periods computed in the framework of fifth phase
@@ -1227,6 +1253,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cmip5-daily-single-levels:
     id: projections-cmip5-daily-single-levels
+    cds_download_supported: false
     title: CMIP5 daily data on single levels
     description: 'This catalogue entry provides daily climate projections on single levels from a large
       number of experiments, models, members and time periods computed in the framework of the fifth phase
@@ -1281,6 +1308,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cmip5-monthly-pressure-levels:
     id: projections-cmip5-monthly-pressure-levels
+    cds_download_supported: false
     title: CMIP5 monthly data on pressure levels
     description: 'This catalogue entry provides monthly climate projections on pressure levels from a
       large number of experiments, models, members and time periods computed in the framework of the fifth
@@ -1335,6 +1363,7 @@ datasets:
         title: CMIP5 daily data on single levels
   projections-cmip5-monthly-single-levels:
     id: projections-cmip5-monthly-single-levels
+    cds_download_supported: false
     title: CMIP5 monthly data on single levels
     description: 'This catalogue entry provides monthly climate projections on single levels from a large
       number of experiments, models, members and time periods computed in the framework of fifth phase
@@ -1389,6 +1418,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cmip6:
     id: projections-cmip6
+    cds_download_supported: false
     title: CMIP6 climate projections
     description: 'This catalogue entry provides daily and monthly global climate projections data from
       a large number of experiments, models and time periods computed in the framework of the sixth phase
@@ -1453,6 +1483,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cmip6-decadal-prototype:
     id: projections-cmip6-decadal-prototype
+    cds_download_supported: false
     title: CMIP6 predictions underpinning the C3S decadal prediction prototypes
     description: 'This catalogue entry provides daily and monthly global climate model data from Decadal
       Climate Predictions Project (DCPP) experiments, part of the sixth phase of the Coupled Model Intercomparison
@@ -1507,6 +1538,7 @@ datasets:
         title: CMIP5 monthly data on pressure levels
   projections-cordex-domains-single-levels:
     id: projections-cordex-domains-single-levels
+    cds_download_supported: false
     title: CORDEX regional climate model data on single levels
     description: This catalogue entry provides Regional Climate Model (RCM) data on single levels from
       a number of experiments, models, domains, resolutions, ensemble members, time frequencies and periods
@@ -1546,6 +1578,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/projections-cordex-domains-single-levels/layout_b9fc8ea84d2c1dca2f467d5144a758a7dcf5b3cf150c248a9f368c5c5cb39895.json
   reanalysis-carra-height-levels:
     id: reanalysis-carra-height-levels
+    cds_download_supported: false
     title: Arctic regional reanalysis on height levels from 1991 to present
     description: 'The C3S Arctic Regional Reanalysis (CARRA) dataset contains hourly data including 3-hourly
       analyses and hourly short term forecasts of atmospheric height level meteorological variables (temperature,
@@ -1596,6 +1629,7 @@ datasets:
         title: Arctic regional reanalysis on single levels from 1991 to present
   reanalysis-carra-means:
     id: reanalysis-carra-means
+    cds_download_supported: false
     title: Arctic regional reanalysis daily and monthly data from 1991 to present
     description: "The daily and monthly data of the C3S Arctic Regional Reanalysis (CARRA) dataset contains\
       \ daily and monthly meteorological variables at 2.5 km resolution. This includes fields at the single\
@@ -1640,6 +1674,7 @@ datasets:
         title: pan-Arctic regional reanalysis sub-daily data from 1986 to present
   reanalysis-carra-model-levels:
     id: reanalysis-carra-model-levels
+    cds_download_supported: false
     title: Arctic regional reanalysis on model levels from 1991 to present
     description: 'The C3S Arctic Regional Reanalysis (CARRA) dataset contains hourly data including 3-hourly
       analyses and hourly short term forecasts of atmospheric model level meteorological variables (temperature,
@@ -1690,6 +1725,7 @@ datasets:
         title: Arctic regional reanalysis on single levels from 1991 to present
   reanalysis-carra-pressure-levels:
     id: reanalysis-carra-pressure-levels
+    cds_download_supported: false
     title: Arctic regional reanalysis on pressure levels from 1991 to present
     description: 'The C3S Arctic Regional Reanalysis (CARRA) dataset contains hourly data including 3-hourly
       analyses and hourly short term forecasts of atmospheric pressure level meteorological variables
@@ -1740,6 +1776,7 @@ datasets:
         title: Arctic regional reanalysis on single levels from 1991 to present
   reanalysis-carra-single-levels:
     id: reanalysis-carra-single-levels
+    cds_download_supported: false
     title: Arctic regional reanalysis on single levels from 1991 to present
     description: 'The C3S Arctic Regional Reanalysis (CARRA) dataset contains 3-hourly analyses and hourly
       short term forecasts of atmospheric and surface meteorological variables (surface and near-surface
@@ -1790,6 +1827,7 @@ datasets:
         title: Arctic regional reanalysis on pressure levels from 1991 to present
   reanalysis-cerra-height-levels:
     id: reanalysis-cerra-height-levels
+    cds_download_supported: false
     title: CERRA sub-daily regional reanalysis data for Europe on height levels from 1984 to present
     description: 'The Copernicus European Regional ReAnalysis (CERRA) datasets provide spatially and temporally
       consistent historical reconstructions of meteorological variables in the atmosphere and at the surface.
@@ -1829,6 +1867,7 @@ datasets:
         title: CERRA sub-daily regional reanalysis data for Europe on pressure levels from 1984 to present
   reanalysis-cerra-land:
     id: reanalysis-cerra-land
+    cds_download_supported: false
     title: CERRA-Land sub-daily regional reanalysis data for Europe from 1984 to present
     description: 'The Copernicus European Regional ReAnalysis Land (CERRA-Land) dataset provides spatially
       and temporally consistent historical reconstructions of surface and soil variables at the same horizontal
@@ -1871,6 +1910,7 @@ datasets:
         title: CERRA sub-daily regional reanalysis data for Europe on pressure levels from 1984 to present
   reanalysis-cerra-model-levels:
     id: reanalysis-cerra-model-levels
+    cds_download_supported: false
     title: CERRA sub-daily regional reanalysis data for Europe on model levels from 1984 to present
     description: 'The Copernicus European Regional ReAnalysis (CERRA) datasets provide spatially and temporally
       consistent historical reconstructions of meteorological variables in the atmosphere and at the surface.
@@ -1912,6 +1952,7 @@ datasets:
         title: CERRA sub-daily regional reanalysis data for Europe on pressure levels from 1984 to present
   reanalysis-cerra-pressure-levels:
     id: reanalysis-cerra-pressure-levels
+    cds_download_supported: false
     title: CERRA sub-daily regional reanalysis data for Europe on pressure levels from 1984 to present
     description: 'The Copernicus European Regional ReAnalysis (CERRA) datasets provide spatially and temporally
       consistent historical reconstruction of meteorological variables in the atmosphere and at the surface.
@@ -1955,6 +1996,7 @@ datasets:
         title: CERRA sub-daily regional reanalysis data for Europe on height levels from 1984 to present
   reanalysis-cerra-single-levels:
     id: reanalysis-cerra-single-levels
+    cds_download_supported: false
     title: CERRA sub-daily regional reanalysis data for Europe on single levels from 1984 to present
     description: 'The Copernicus European Regional ReAnalysis (CERRA) datasets provide spatially and temporally
       consistent historical reconstructions of meteorological variables in the atmosphere and at the surface.
@@ -1997,6 +2039,7 @@ datasets:
         title: CERRA sub-daily regional reanalysis data for Europe on pressure levels from 1984 to present
   reanalysis-era5-complete:
     id: reanalysis-era5-complete
+    cds_download_supported: false
     title: Complete ERA5 global atmospheric reanalysis
     description: 'ERA5 is the fifth generation ECMWF atmospheric reanalysis of the global climate covering
       the period from January 1940 to present. It is produced by the Copernicus Climate Change Service
@@ -2036,6 +2079,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/reanalysis-era5-complete/layout_927cc80b9fd3270423ec3a70562403043b5aa4fac453306a46eca834ec7ed2f3.json
   reanalysis-era5-land:
     id: reanalysis-era5-land
+    cds_download_supported: true
     title: ERA5-Land hourly data from 1950 to present
     description: "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land\
       \ variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been\
@@ -2081,6 +2125,7 @@ datasets:
         title: ERA5-Land monthly averaged data from 1950 to present
   reanalysis-era5-land-monthly-means:
     id: reanalysis-era5-land-monthly-means
+    cds_download_supported: false
     title: ERA5-Land monthly averaged data from 1950 to present
     description: 'ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land
       variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced
@@ -2128,6 +2173,7 @@ datasets:
         title: ERA5-Land hourly data from 1950 to present
   reanalysis-era5-land-timeseries:
     id: reanalysis-era5-land-timeseries
+    cds_download_supported: false
     title: ERA5 Land hourly time-series data from 1950 to present
     description: "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land\
       \ variables over several decades at an enhanced resolution compared to the \nFifth Generation of\
@@ -2167,6 +2213,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/reanalysis-era5-land-timeseries/layout_9a2b56078b29e1a73f268191e913635b22c60dea6d6ad8afe3917e82225089fa.json
   reanalysis-era5-pressure-levels:
     id: reanalysis-era5-pressure-levels
+    cds_download_supported: true
     title: ERA5 hourly data on pressure levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -2228,6 +2275,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   reanalysis-era5-pressure-levels-monthly-means:
     id: reanalysis-era5-pressure-levels-monthly-means
+    cds_download_supported: false
     title: ERA5 monthly averaged data on pressure levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -2290,6 +2338,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   reanalysis-era5-single-levels:
     id: reanalysis-era5-single-levels
+    cds_download_supported: true
     title: ERA5 hourly data on single levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -2352,6 +2401,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   reanalysis-era5-single-levels-monthly-means:
     id: reanalysis-era5-single-levels-monthly-means
+    cds_download_supported: false
     title: ERA5 monthly averaged data on single levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -2414,6 +2464,7 @@ datasets:
         title: Complete ERA5 global atmospheric reanalysis
   reanalysis-era5-single-levels-timeseries:
     id: reanalysis-era5-single-levels-timeseries
+    cds_download_supported: false
     title: ERA5 hourly time-series data on single levels from 1940 to present
     description: 'ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for
       the past 8 decades.
@@ -2464,6 +2515,7 @@ datasets:
         title: ERA5 hourly data on single levels from 1940 to present
   reanalysis-oras5:
     id: reanalysis-oras5
+    cds_download_supported: false
     title: ORAS5 global ocean reanalysis monthly data from 1958 to present
     description: 'This dataset provides global ocean and sea-ice reanalysis (ORAS5: Ocean Reanalysis System
       5) monthly mean data prepared by the  European Centre for Medium-Range Weather Forecasts (ECMWF)
@@ -2512,6 +2564,7 @@ datasets:
           resolution CMIP6 climate projections
   reanalysis-oras5-timeseries:
     id: reanalysis-oras5-timeseries
+    cds_download_supported: false
     title: ORAS5 global ocean reanalysis monthly time-series data from 1958 to present
     description: 'This catalogue entry provides monthly mean time series from the global ocean and sea-ice
       reanalysis ORAS5 (Ocean Reanalysis System 5), with data organised to prioritise temporal access
@@ -2556,6 +2609,7 @@ datasets:
         title: Gridded dataset underpinning the Copernicus Interactive Climate Atlas
   reanalysis-pan-carra:
     id: reanalysis-pan-carra
+    cds_download_supported: false
     title: pan-Arctic regional reanalysis sub-daily data from 1986 to present
     description: 'The C3S Arctic Regional Reanalysis second generation (CARRA2) dataset contains 3-hourly
       analyses at 2.5 km resolution. These variables are specified at single levels (including surface)
@@ -2601,6 +2655,7 @@ datasets:
         title: Arctic regional reanalysis daily and monthly data from 1991 to present
   reanalysis-pan-carra-means:
     id: reanalysis-pan-carra-means
+    cds_download_supported: false
     title: pan-Arctic regional reanalysis daily and monthly data from 1986 to present
     description: "The C3S Arctic Regional Reanalysis second generation (CARRA2) dataset contains daily\
       \ and monthly meteorological variables at 2.5 km resolution. These variables are specified at single\
@@ -2645,6 +2700,7 @@ datasets:
         title: Arctic regional reanalysis daily and monthly data from 1991 to present
   reanalysis-uerra-europe-complete:
     id: reanalysis-uerra-europe-complete
+    cds_download_supported: false
     title: Complete UERRA regional reanalysis for Europe from 1961 to 2019
     description: 'The UERRA datasets contain reanalysis data of the atmosphere, the surface and near-surface
       as well as for the soil covering Europe. Essential climate variables are generated with the UERRA-HARMONIE
@@ -2689,6 +2745,7 @@ datasets:
         title: UERRA regional reanalysis for Europe on pressure levels from 1961 to 2019
   reanalysis-uerra-europe-height-levels:
     id: reanalysis-uerra-europe-height-levels
+    cds_download_supported: false
     title: UERRA regional reanalysis for Europe on height levels from 1961 to 2019
     description: 'The present UERRA dataset contains analyses of atmospheric variables on height levels,
       from 1961 to 2019.
@@ -2733,6 +2790,7 @@ datasets:
         title: UERRA regional reanalysis for Europe on pressure levels from 1961 to 2019
   reanalysis-uerra-europe-pressure-levels:
     id: reanalysis-uerra-europe-pressure-levels
+    cds_download_supported: false
     title: UERRA regional reanalysis for Europe on pressure levels from 1961 to 2019
     description: "The present UERRA dataset contains analyses of atmospheric variables on pressure levels,\
       \ from 1961 to 2019. \nIt has been generated using the UERRA-HARMONIE system by combining model\
@@ -2776,6 +2834,7 @@ datasets:
         title: UERRA regional reanalysis for Europe on height levels from 1961 to 2019
   reanalysis-uerra-europe-single-levels:
     id: reanalysis-uerra-europe-single-levels
+    cds_download_supported: false
     title: UERRA regional reanalysis for Europe on single levels from 1961 to 2019
     description: 'This UERRA dataset contains analyses of surface and near-surface essential climate variables
       from
@@ -2828,6 +2887,7 @@ datasets:
         title: UERRA regional reanalysis for Europe on pressure levels from 1961 to 2019
   reanalysis-uerra-europe-soil-levels:
     id: reanalysis-uerra-europe-soil-levels
+    cds_download_supported: false
     title: UERRA regional reanalysis for Europe on soil levels from 1961 to 2019
     description: 'The UERRA dataset provides estimations of the climate in Europe based on model data
 
@@ -2875,6 +2935,7 @@ datasets:
         title: UERRA regional reanalysis for Europe on single levels from 1961 to 2019
   satellite-aerosol-properties:
     id: satellite-aerosol-properties
+    cds_download_supported: false
     title: Aerosol properties gridded data from 1995 to present derived from satellite observations
     description: 'This data set provides observational records of aerosol properties obtained from observations
       collected by various satellite instruments. Aerosols are minor constituents of the atmosphere by
@@ -2919,6 +2980,7 @@ datasets:
         title: Ozone monthly gridded data from 1970 to present derived from satellite observations
   satellite-albedo:
     id: satellite-albedo
+    cds_download_supported: false
     title: Surface albedo 10-daily gridded data from 1981 to present
     description: 'This catalogue entry provides satellite-derived estimates of surface albedo, an Essential
       Climate Variable (ECV) as defined by the Global Climate Observing System (GCOS). Surface albedo
@@ -2970,6 +3032,7 @@ datasets:
           data from 1981 to present
   satellite-carbon-dioxide:
     id: satellite-carbon-dioxide
+    cds_download_supported: false
     title: Carbon dioxide data from 2002 to present derived from satellite observations
     description: 'This dataset provides atmospheric CO₂ observations as derived from satellite radiances.
       It consists of two types of products each covering a different part of the atmosphere: (i) The average
@@ -3013,6 +3076,7 @@ datasets:
         title: Ozone monthly gridded data from 1970 to present derived from satellite observations
   satellite-cloud-properties:
     id: satellite-cloud-properties
+    cds_download_supported: false
     title: Cloud properties global gridded monthly and daily data from 1979 to present derived from satellite
       observations
     description: Cloud properties directly influence the state of the Earth´s upper-air atmosphere. Clouds
@@ -3059,6 +3123,7 @@ datasets:
         title: Surface radiation budget from 1979 to present derived from satellite observations
   satellite-earth-radiation-budget:
     id: satellite-earth-radiation-budget
+    cds_download_supported: false
     title: Earth's radiation budget from 1979 to present derived from satellite observations
     description: "The Earth’s Radiation Budget (ERB) represents the overall balance between incoming and\
       \ outgoing radiant energy at the Earth’s top-of-the-atmosphere. This Essential Climate Variable\
@@ -3105,6 +3170,7 @@ datasets:
           satellite observations
   satellite-fire-burned-area:
     id: satellite-fire-burned-area
+    cds_download_supported: false
     title: Fire burned area from 2001 to present derived from satellite observations
     description: The Burned Area products provide global information of total burned area (BA) at pixel
       and grid scale. The BA is identified with the date of first detection of the burned signal in the
@@ -3155,6 +3221,7 @@ datasets:
           data from 1981 to present
   satellite-fire-radiative-power:
     id: satellite-fire-radiative-power
+    cds_download_supported: false
     title: Fire radiative power and active fire pixels from 2020 to present derived from satellite observations
     description: This dataset provides global information on the timing and location of Active Fires (AF)
       burning on Earth's surface during satellite overpasses, and also records their Fire Radiative Power
@@ -3191,6 +3258,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-fire-radiative-power/layout_1bf81bd022b4a6803ec4ce32eda781c093f3a369696db37a24a8a2f824fd893d.json
   satellite-greenland-ice-sheet-velocity:
     id: satellite-greenland-ice-sheet-velocity
+    cds_download_supported: false
     title: Ice sheet velocity for Antarctica and Greenland derived from satellite observations
     description: 'This dataset provides annual ice velocity maps of the Greenland and Antarctic Ice Sheets
       derived from Sentinel-1 data. The product represents the current state-of-the-art in Europe for
@@ -3236,6 +3304,7 @@ datasets:
           observations
   satellite-humidity-profiles:
     id: satellite-humidity-profiles
+    cds_download_supported: false
     title: Tropospheric humidity profiles averaged monthly and zonally from 2006 to present derived from
       satellite observations
     description: This dataset provides monthly and zonally averaged tropospheric humidity profiles derived
@@ -3281,6 +3350,7 @@ datasets:
         title: Upper tropospheric humidity gridded data derived from satellite observations
   satellite-ice-sheet-elevation-change:
     id: satellite-ice-sheet-elevation-change
+    cds_download_supported: false
     title: Ice sheet surface elevation change rate for Greenland and Antarctica from 1992 to present derived
       from satellite observations
     description: 'This dataset provides estimates of surface elevation change over the Greenland and Antarctic
@@ -3327,6 +3397,7 @@ datasets:
           observations
   satellite-ice-sheet-mass-balance:
     id: satellite-ice-sheet-mass-balance
+    cds_download_supported: false
     title: Gravimetric mass balance data for the Antarctic and Greenland ice sheets derived from satellite
       observations
     description: 'This dataset provides a complete archive of monthly mass change timeseries for the drainage
@@ -3372,6 +3443,7 @@ datasets:
           derived from satellite observations
   satellite-ist-sst-global:
     id: satellite-ist-sst-global
+    cds_download_supported: false
     title: Combined sea surface and sea ice surface temperature data derived from satellite observations
     description: 'This dataset provides daily and monthly fields of global sea surface temperature (SST)
       and sea ice surface temperature (IST) from 1982 to the present, using observations from multiple
@@ -3414,6 +3486,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-ist-sst-polar:
     id: satellite-ist-sst-polar
+    cds_download_supported: false
     title: Sea ice surface temperature derived from satellite observations
     description: 'This dataset provides daily and monthly sea ice surface temperature (IST) fields over
       the polar oceans from 1982 to the present. The data are derived from thermal infrared measurements
@@ -3467,6 +3540,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-lai-fapar:
     id: satellite-lai-fapar
+    cds_download_supported: false
     title: Leaf area index and fraction absorbed of photosynthetically active radiation 10-daily gridded
       data from 1981 to present
     description: 'This catalogue entry provides satellite-derived estimates of two related variables:
@@ -3517,6 +3591,7 @@ datasets:
           observations
   satellite-lake-water-level:
     id: satellite-lake-water-level
+    cds_download_supported: false
     title: Lake water levels from 1992 to present derived from satellite observations
     description: "This dataset provides lake water levels for 311 selected lakes on four continents derived\
       \ from satellite radar altimetry. Lake water level information is traditionally obtained via ground-based\
@@ -3554,6 +3629,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-lake-water-level/layout_2785de82a2b57a1ac5ee851021182c4542e03db2f128af0459472d8c2bf4231b.json
   satellite-lake-water-temperature:
     id: satellite-lake-water-temperature
+    cds_download_supported: false
     title: Lake surface water temperature from 1995 to present derived from satellite observations
     description: This dataset provides daily mid-morning measurements for Lake Surface Water Temperature
       (LSWT) derived from satellite observations. LSWT, together with five other variables (lake ice cover
@@ -3607,6 +3683,7 @@ datasets:
           measurements
   satellite-land-cover:
     id: satellite-land-cover
+    cds_download_supported: false
     title: Land cover classification gridded maps from 1992 to present derived from satellite observations
     description: "This dataset provides global maps describing the land surface into 22 classes, which\
       \ have been defined using the United Nations Food and Agriculture Organization’s (UN FAO) Land Cover\
@@ -3657,6 +3734,7 @@ datasets:
           data from 1981 to present
   satellite-land-surface-temperature:
     id: satellite-land-surface-temperature
+    cds_download_supported: false
     title: Land surface temperature monthly gridded data from 1995 to present derived from satellite observations
     description: 'This dataset contains monthly daytime and nighttime clear-sky land surface temperatures
       (LSTs) and their uncertainty estimates from multiple Infra-Red (IR) instruments on polar orbiting
@@ -3694,6 +3772,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-land-surface-temperature/layout_db0a5bb8b0dd970c31b41331fbb28dee5b3c4326edc4e817d141c4456fde2c51.json
   satellite-methane:
     id: satellite-methane
+    cds_download_supported: false
     title: Methane data from 2002 to present derived from satellite observations
     description: 'This dataset provides atmospheric CH₄ observations as derived from satellite radiances.
       It consists of two types of products each covering a different part of the atmosphere: (i) The average
@@ -3737,6 +3816,7 @@ datasets:
         title: Ozone monthly gridded data from 1970 to present derived from satellite observations
   satellite-ocean-colour:
     id: satellite-ocean-colour
+    cds_download_supported: false
     title: Ocean colour daily data from 1997 to present derived from satellite observations
     description: This dataset provides global daily estimates of ocean surface chlorophyll-a concentration
       and remote sensing reflectance derived from multiple satellite sensors. These two products are part
@@ -3773,6 +3853,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-ocean-colour/layout_08f8c737a73d3daf5bbb71a9a92d5b515994875d1450d64032c693d4c5564fbf.json
   satellite-ozone-v1:
     id: satellite-ozone-v1
+    cds_download_supported: false
     title: Ozone monthly gridded data from 1970 to present derived from satellite observations
     description: "This dataset provides monthly averaged ozone values derived from a large set of satellite\
       \ sensors with global coverage.  Ozone is naturally formed in the atmosphere through the interaction\
@@ -3816,6 +3897,7 @@ datasets:
         title: Methane data from 2002 to present derived from satellite observations
   satellite-precipitation:
     id: satellite-precipitation
+    cds_download_supported: false
     title: Precipitation monthly and daily gridded data from 1979 to present derived from satellite measurements
     description: 'Within the hydrological cycle, precipitation is the main component of water transport
       from the atmosphere to the Earth’s surface. Precipitation varies strongly, depending on geographical
@@ -3861,6 +3943,7 @@ datasets:
           observations
   satellite-precipitation-microwave:
     id: satellite-precipitation-microwave
+    cds_download_supported: false
     title: Precipitation monthly and daily gridded data from 2000 to 2017 derived from satellite microwave
       observations
     description: 'This dataset provides global estimates of daily accumulated and monthly means of precipitation.
@@ -3901,6 +3984,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-precipitation-microwave/layout_439c952fb967f240128c033b8ff8cc1053535df7084d766b89e1c165220962e4.json
   satellite-precipitation-microwave-infrared:
     id: satellite-precipitation-microwave-infrared
+    cds_download_supported: false
     title: Daily and monthly Global Interpolated RAinFall Estimation (GIRAFE) data derived from satellite
       observations
     description: This dataset provides global estimates of precipitation based on satellite observations.
@@ -3939,6 +4023,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-precipitation-microwave-infrared/layout_4454b88dee092c49e08383fb2b8c63720119074422599a7b91cfebbfb00e3fd1.json
   satellite-sea-ice-concentration:
     id: satellite-sea-ice-concentration
+    cds_download_supported: false
     title: Sea ice concentration from 1978 to present derived from satellite observations
     description: This dataset provides daily gridded data of sea ice concentration for both hemispheres
       derived from satellite passive microwave brightness temperatures. Sea ice is an important component
@@ -3992,6 +4077,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-sea-ice-drift:
     id: satellite-sea-ice-drift
+    cds_download_supported: false
     title: Sea ice drift daily gridded data derived from satellite observations
     description: 'This dataset provides daily gridded fields of sea ice drift vectors for both hemispheres
       derived from satellite passive microwave brightness temperatures and atmospheric reanalysis data.
@@ -4046,6 +4132,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-sea-ice-edge-type:
     id: satellite-sea-ice-edge-type
+    cds_download_supported: false
     title: Sea ice edge and type daily gridded data from 1978 to present derived from satellite observations
     description: This dataset provides daily gridded data of sea ice edge and sea ice type derived from
       brightness temperatures measured by satellite passive microwave radiometers. Sea ice is an important
@@ -4100,6 +4187,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-sea-ice-thickness:
     id: satellite-sea-ice-thickness
+    cds_download_supported: false
     title: Sea ice thickness gridded data for the Arctic derived from satellite observations
     description: 'This dataset provides gridded sea ice thickness data for the Arctic, derived from satellite
       observations. Sea ice plays a vital role in the climate system, influencing air-sea interactions,
@@ -4143,6 +4231,7 @@ datasets:
         title: Sea level gridded data from satellite observations for the global ocean from 1993 to present
   satellite-sea-level-global:
     id: satellite-sea-level-global
+    cds_download_supported: false
     title: Sea level gridded data from satellite observations for the global ocean from 1993 to present
     description: This dataset provides gridded daily and monthly mean global estimates of sea level anomaly
       based on satellite altimetry measurements. The rise in global mean sea level in recent decades has
@@ -4183,6 +4272,7 @@ datasets:
         title: Sea ice thickness gridded data for the Arctic derived from satellite observations
   satellite-sea-surface-temperature:
     id: satellite-sea-surface-temperature
+    cds_download_supported: true
     title: Global sea surface temperature derived from satellite observations
     description: 'This dataset provides daily and monthly global estimates of sea surface temperature
       (SST) based on observations from multiple satellite sensors since July 1979 (for the daily product)
@@ -4224,6 +4314,7 @@ datasets:
         title: Combined sea surface and sea ice surface temperature data derived from satellite observations
   satellite-sea-surface-temperature-ensemble-product:
     id: satellite-sea-surface-temperature-ensemble-product
+    cds_download_supported: false
     title: Sea surface temperature daily gridded data from 1981 to 2016 derived from a multi-product satellite-based
       ensemble
     description: This dataset provides global daily sea surface temperature (SST) data from the Group
@@ -4278,6 +4369,7 @@ datasets:
         title: Global sea surface temperature derived from satellite observations
   satellite-snow-water-equivalent:
     id: satellite-snow-water-equivalent
+    cds_download_supported: false
     title: Snow water equivalent for the Northern Hemisphere from 1979 to present derived from satellite
       observations
     description: Snow water equivalent (SWE) is an important variable indicating the amount of accumulated
@@ -4315,6 +4407,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/satellite-snow-water-equivalent/layout_6c66067c8da21f5be242e393f34a3494f24cbde02589ce8e53a151a31073f078.json
   satellite-soil-moisture:
     id: satellite-soil-moisture
+    cds_download_supported: false
     title: Soil moisture gridded data from 1978 to present
     description: "The C3S satellite soil moisture (SM) service provides a range of global soil moisture\
       \ variables derived from numerous satellite sensors, including scatterometers and radiometers. The\
@@ -4359,6 +4452,7 @@ datasets:
           observations
   satellite-surface-radiation-budget:
     id: satellite-surface-radiation-budget
+    cds_download_supported: false
     title: Surface radiation budget from 1979 to present derived from satellite observations
     description: The Surface Radiation Budget (SRB) represents the balance between the heating of the
       Earth’s surface through absorption of incoming solar radiation and cooling through the emission
@@ -4402,6 +4496,7 @@ datasets:
           satellite observations
   satellite-terrestrial-water-storage:
     id: satellite-terrestrial-water-storage
+    cds_download_supported: false
     title: Terrestrial water storage anomaly data from 2002 to present derived from satellite gravimetry
       observations
     description: 'This dataset provides global Terrestrial Water Storage Anomalies (TWSA) on a 0.5° regular
@@ -4447,6 +4542,7 @@ datasets:
           observations
   satellite-total-column-water-vapour-land-ocean:
     id: satellite-total-column-water-vapour-land-ocean
+    cds_download_supported: false
     title: Global monthly and daily high-spatial resolution of total column water vapour from 2002 to
       2017 derived from satellite observations
     description: 'Atmospheric water vapor, quantified here as Total Column Water Vapor (TCWV), holds paramount
@@ -4503,6 +4599,7 @@ datasets:
         title: Upper tropospheric humidity gridded data derived from satellite observations
   satellite-total-column-water-vapour-ocean:
     id: satellite-total-column-water-vapour-ocean
+    cds_download_supported: false
     title: Monthly and 6-hourly total column water vapour over ocean from 1988 to 2020 derived from satellite
       observations
     description: 'Water vapour is has been recognised as an  Essential Climate Variable as it provides
@@ -4559,6 +4656,7 @@ datasets:
         title: Upper tropospheric humidity gridded data derived from satellite observations
   satellite-upper-troposphere-humidity:
     id: satellite-upper-troposphere-humidity
+    cds_download_supported: false
     title: Upper tropospheric humidity gridded data derived from satellite observations
     description: "Upper Tropospheric Humidity (UTH) is of key importance to the Earth’s greenhouse effect\
       \ and understanding of climate change. It is considered an Essential Climate Variable  (ECV) because\
@@ -4612,6 +4710,7 @@ datasets:
           satellite observations
   seasonal-monthly-ocean:
     id: seasonal-monthly-ocean
+    cds_download_supported: false
     title: Seasonal forecast monthly averages of ocean variables
     description: "This entry covers global ocean data aggregated to a monthly time resolution. The catalogue\
       \ entry includes temperature and salinity characteristics of the upper oceans and complements the\
@@ -4651,6 +4750,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/seasonal-monthly-ocean/layout_32397f9ec88fe0316fc11027d63904fe4f933cdd3cefcfbf91ef685beeaba197.json
   seasonal-monthly-pressure-levels:
     id: seasonal-monthly-pressure-levels
+    cds_download_supported: false
     title: Seasonal forecast monthly statistics on pressure levels
     description: "This entry covers pressure-level data aggregated on a monthly time resolution. \nSeasonal\
       \ forecasts provide a long-range outlook of changes in the Earth system over periods of a few weeks\
@@ -4702,6 +4802,7 @@ datasets:
         title: Seasonal forecast anomalies on single levels
   seasonal-monthly-single-levels:
     id: seasonal-monthly-single-levels
+    cds_download_supported: false
     title: Seasonal forecast monthly statistics on single levels
     description: "This entry covers single-level data aggregated on a monthly time resolution. \nSeasonal\
       \ forecasts provide a long-range outlook of changes in the Earth system over periods of a few weeks\
@@ -4753,6 +4854,7 @@ datasets:
         title: Seasonal forecast anomalies on single levels
   seasonal-original-pressure-levels:
     id: seasonal-original-pressure-levels
+    cds_download_supported: false
     title: Seasonal forecast subdaily data on pressure levels
     description: "This entry covers pressure-level data at the original time resolution (once every 12\
       \ hours). \nSeasonal forecasts provide a long-range outlook of changes in the Earth system over\
@@ -4804,6 +4906,7 @@ datasets:
         title: Seasonal forecast anomalies on single levels
   seasonal-original-single-levels:
     id: seasonal-original-single-levels
+    cds_download_supported: false
     title: Seasonal forecast daily and subdaily data on single levels
     description: "This entry covers single-level data and soil-level data at the original time resolution\
       \ (once a day, or once every 6 hours, depending on the variable). \nSeasonal forecasts provide a\
@@ -4855,6 +4958,7 @@ datasets:
         title: Seasonal forecast anomalies on single levels
   seasonal-postprocessed-pressure-levels:
     id: seasonal-postprocessed-pressure-levels
+    cds_download_supported: false
     title: Seasonal forecast anomalies on pressure levels
     description: "This entry covers pressure-level data post-processed for bias adjustment on a monthly\
       \ time resolution. \nSeasonal forecasts provide a long-range outlook of changes in the Earth system\
@@ -4906,6 +5010,7 @@ datasets:
         title: Seasonal forecast anomalies on single levels
   seasonal-postprocessed-single-levels:
     id: seasonal-postprocessed-single-levels
+    cds_download_supported: false
     title: Seasonal forecast anomalies on single levels
     description: "This entry covers single-level data post-processed for bias adjustment on a monthly\
       \ time resolution. \nSeasonal forecasts provide a long-range outlook of changes in the Earth system\
@@ -4957,6 +5062,7 @@ datasets:
         title: Seasonal forecast daily and subdaily data on single levels
   sis-agroclimatic-indicators:
     id: sis-agroclimatic-indicators
+    cds_download_supported: false
     title: Agroclimatic indicators from 1951 to 2099 derived from climate projections
     description: 'This dataset provides agroclimatic indicators used to characterise plant-climate interactions
       for global agriculture. Agroclimatic indicators are useful in conveying climate variability and
@@ -4999,6 +5105,7 @@ datasets:
         title: Agrometeorological indicators from 1979 to present derived from reanalysis
   sis-agrometeorological-indicators:
     id: sis-agrometeorological-indicators
+    cds_download_supported: false
     title: Agrometeorological indicators from 1979 to present derived from reanalysis
     description: This dataset provides daily surface meteorological data for the period from 1979 to present
       as input for agriculture and agro-ecological studies. This dataset is based on the hourly ECMWF
@@ -5039,6 +5146,7 @@ datasets:
         title: Agroclimatic indicators from 1951 to 2099 derived from climate projections
   sis-biodiversity-cmip5-global:
     id: sis-biodiversity-cmip5-global
+    cds_download_supported: false
     title: Global bioclimatic indicators from 1950 to 2100 derived from climate projections
     description: "This dataset provides global bioclimatic indicators derived from CMIP5 climate projections.\
       \ These bioclimatic indicators describe how the climate affects ecosystems, the services ecosystems\
@@ -5085,6 +5193,7 @@ datasets:
         title: Downscaled bioclimatic indicators for selected regions from 1979 to 2018 derived from reanalysis
   sis-biodiversity-cmip5-regional:
     id: sis-biodiversity-cmip5-regional
+    cds_download_supported: false
     title: Downscaled bioclimatic indicators for selected regions from 1950 to 2100 derived from climate
       projections
     description: 'The dataset provides bioclimatic indicators derived from CMIP5 climate projections at
@@ -5132,6 +5241,7 @@ datasets:
         title: Downscaled bioclimatic indicators for selected regions from 1979 to 2018 derived from reanalysis
   sis-biodiversity-era5-global:
     id: sis-biodiversity-era5-global
+    cds_download_supported: false
     title: Global bioclimatic indicators from 1979 to 2018 derived from reanalysis
     description: 'This dataset provides a historical global reconstruction of bioclimatic indicators derived
       from ERA5 reanalysis on a latitude-longitude grid. These bioclimate indicators describe how the
@@ -5179,6 +5289,7 @@ datasets:
         title: Downscaled bioclimatic indicators for selected regions from 1979 to 2018 derived from reanalysis
   sis-biodiversity-era5-regional:
     id: sis-biodiversity-era5-regional
+    cds_download_supported: false
     title: Downscaled bioclimatic indicators for selected regions from 1979 to 2018 derived from reanalysis
     description: 'This dataset provides a historical reconstruction of bioclimatic indicators at 1  x
       1 km resolution for Europe, Northern Brazil and Central Africa. These bioclimate indicators describe
@@ -5226,6 +5337,7 @@ datasets:
         title: Global bioclimatic indicators from 1979 to 2018 derived from reanalysis
   sis-ecde-climate-indicators:
     id: sis-ecde-climate-indicators
+    cds_download_supported: false
     title: Climate indicators for Europe from 1940 to 2100 derived from reanalysis and climate projections
     description: 'This dataset provides a series of climate indices derived from reanalysis and model
       simulations data hosted on the Copernicus Climate Data Store (CDS). These indicators describe how
@@ -5278,6 +5390,7 @@ datasets:
           European climate projections
   sis-ecv-cmip5-bias-corrected:
     id: sis-ecv-cmip5-bias-corrected
+    cds_download_supported: false
     title: Essential climate variables for water sector applications derived from climate projections
     description: "This dataset contains 4 Essential Climate Variables (ECV) for the 18 bias adjusted Global\
       \ Climate Models (GCM) from CMIP5: daily precipitation rate, and daily mean, maximum and minimum\
@@ -5316,6 +5429,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/sis-ecv-cmip5-bias-corrected/layout_af73f63f71820f1adb7a59fbff6c7ff1e948f8d63cda4744eff9d1e603835b99.json
   sis-energy-derived-projections:
     id: sis-energy-derived-projections
+    cds_download_supported: false
     title: Climate and energy indicators for Europe from 2005 to 2100 derived from climate projections
     description: 'This dataset provides climate and energy indicators for the Europe as part of the Copernicus
       climate change service (C3S) Energy operational service. The climate-relevant indicators for the
@@ -5364,6 +5478,7 @@ datasets:
         title: Climate indicators for Europe from 1940 to 2100 derived from reanalysis and climate projections
   sis-energy-derived-reanalysis:
     id: sis-energy-derived-reanalysis
+    cds_download_supported: false
     title: Climate and energy indicators for Europe from 1979 to present derived from reanalysis
     description: 'The Copernicus climate change service (C3S) operational energy dataset provides climate
       and energy indicators for the European energy sector. The climate-relevant indicators for the energy
@@ -5404,6 +5519,7 @@ datasets:
           reanalysis and climate projections
   sis-energy-pecd:
     id: sis-energy-pecd
+    cds_download_supported: false
     title: Climate and energy related variables from the Pan-European Climate Database derived from reanalysis
       and climate projections
     description: The Pan-European Climate Database (PECD) provides information on climate and renewable
@@ -5448,6 +5564,7 @@ datasets:
         title: Climate and energy indicators for Europe from 1979 to present derived from reanalysis
   sis-european-risk-extreme-precipitation-indicators:
     id: sis-european-risk-extreme-precipitation-indicators
+    cds_download_supported: false
     title: Extreme precipitation risk indicators for Europe and European cities from 1950 to 2019
     description: 'The dataset presents climate impact indicators related to extreme precipitation in Europe
       under current climate conditions. The suite of indicators include recent historic records, recurrence
@@ -5490,6 +5607,7 @@ datasets:
         title: ERA5 hourly time-series data on single levels from 1940 to present
   sis-european-wind-storm-indicators:
     id: sis-european-wind-storm-indicators
+    cds_download_supported: false
     title: Winter windstorm indicators for Europe from 1979 to 2021 derived from reanalysis
     description: This dataset provides climatological indicators on European winter windstorms and their
       economic impact derived from ERA5 reanalysis. Also provided are risk indicators from a synthetically
@@ -5536,6 +5654,7 @@ datasets:
           reanalysis and climate projections
   sis-european-wind-storm-reanalysis:
     id: sis-european-wind-storm-reanalysis
+    cds_download_supported: false
     title: Windstorm tracks and footprints derived from reanalysis over Europe between 1940 to present
     description: This dataset provides climate indicators of windstorms associated with extratropical
       cyclones, derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts
@@ -5582,6 +5701,7 @@ datasets:
           reanalysis and climate projections
   sis-european-wind-storm-synthetic-events:
     id: sis-european-wind-storm-synthetic-events
+    cds_download_supported: false
     title: Synthetic windstorm events for Europe from 1986 to 2011
     description: This dataset contains a set of synthetic windstorm events consisting of 22,980 individual
       storm footprints over Europe. These are a physically realistic set of plausible windstorm events
@@ -5638,6 +5758,7 @@ datasets:
           European climate projections
   sis-extreme-indices-cmip6:
     id: sis-extreme-indices-cmip6
+    cds_download_supported: false
     title: Climate extreme indices and heat stress indicators derived from CMIP6 global climate projections
     description: The dataset provides climate extreme indices related to temperature and precipitation
       as defined by the Expert Team on Climate Change Detection and Indices (ETCCDI), as well as selected
@@ -5675,6 +5796,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/sis-extreme-indices-cmip6/layout_b975304670e9532fa5e1e60370f5d76370611e9fd08c3f6556b2253bae343aa5.json
   sis-health-vector:
     id: sis-health-vector
+    cds_download_supported: false
     title: Climatic suitability for the presence and seasonal activity of the Aedes albopictus mosquito
       for Europe derived from climate projections
     description: 'This dataset contains climatic suitability indicators for the Aedes albopictus (tiger
@@ -5716,6 +5838,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/sis-health-vector/layout_5e3e9bd768f684965744ab44642fd66174921fc20f8fbc1a32855eab717a55a9.json
   sis-heat-and-cold-spells:
     id: sis-heat-and-cold-spells
+    cds_download_supported: false
     title: Heat waves and cold spells in  Europe derived from climate projections
     description: "The dataset contains the number of hot and cold spell days using different European-wide\
       \ and national/regional definitions developed within the C3S European Health service.\n These heat\
@@ -5755,6 +5878,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/sis-heat-and-cold-spells/layout_4a2e240d2bfe7c5dc7a379600ab190fdeac6c36f815675090468ca64d436e681.json
   sis-hydrology-meteorology-derived-projections:
     id: sis-hydrology-meteorology-derived-projections
+    cds_download_supported: false
     title: Temperature and precipitation climate impact indicators from 1970 to 2100 derived from European
       climate projections
     description: "This dataset provides precipitation and near surface air temperature for Europe as Essential\
@@ -5803,6 +5927,7 @@ datasets:
           European climate projections
   sis-hydrology-variables-derived-projections:
     id: sis-hydrology-variables-derived-projections
+    cds_download_supported: false
     title: Hydrology-related climate impact indicators from 1970 to 2100 derived from bias adjusted European
       climate projections
     description: "This dataset provides water variables and indicators based on hydrological impact modelling,\
@@ -5856,6 +5981,7 @@ datasets:
           European climate projections
   sis-hydrology-variables-derived-seasonal-forecast:
     id: sis-hydrology-variables-derived-seasonal-forecast
+    cds_download_supported: false
     title: Multi-model seasonal forecasts of river discharge for Europe from January 2021 to present
     description: 'This dataset provides hydrological seasonal forecasts of monthly mean river discharge
       across Europe. Two hydrological model ensembles are provided. The first is an E-HYPE multi-model
@@ -5902,6 +6028,7 @@ datasets:
           European climate projections
   sis-hydrology-variables-derived-seasonal-reforecast:
     id: sis-hydrology-variables-derived-seasonal-reforecast
+    cds_download_supported: false
     title: Multi-model seasonal reforecasts of river discharge for Europe
     description: 'This dataset provides hydrological seasonal reforecasts of monthly mean river discharge
       across Europe for the period 1993 to 2016. The first is an E-HYPE multi-model system comprising
@@ -5946,6 +6073,7 @@ datasets:
           European climate projections
   sis-marine-properties:
     id: sis-marine-properties
+    cds_download_supported: false
     title: Marine biogeochemistry data for the Northwest European Shelf and Mediterranean Sea from 2006
       up to 2100 derived from climate projections
     description: The dataset contains model projections of changes in marine physics and biogeochemistry
@@ -5985,6 +6113,7 @@ datasets:
       layout: https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-catalogue/resources/sis-marine-properties/layout_f3985644a0ebc0a86b19933b1e9913a61e87aec4c55150154e3e04b66ccf392d.json
   sis-ocean-wave-indicators:
     id: sis-ocean-wave-indicators
+    cds_download_supported: false
     title: Ocean surface wave indicators for the European coast from 1977 to 2100 derived from climate
       projections
     description: 'The dataset presents wave climate indicators based upon ocean surface wave parameters
@@ -6029,6 +6158,7 @@ datasets:
           projections
   sis-ocean-wave-timeseries:
     id: sis-ocean-wave-timeseries
+    cds_download_supported: false
     title: Ocean surface wave time series for the European coast from 1976 to 2100 derived from climate
       projections
     description: 'The dataset presents time series of the coastal wave climate based upon ocean surface
@@ -6074,6 +6204,7 @@ datasets:
           projections
   sis-temperature-statistics:
     id: sis-temperature-statistics
+    cds_download_supported: false
     title: Temperature statistics for Europe derived from climate projections
     description: 'This dataset contains temperature exposure statistics for Europe (e.g. percentiles)
       derived from the daily 2 metre mean, minimum and maximum air temperature for the entire year, winter
@@ -6122,6 +6253,7 @@ datasets:
           European climate projections
   sis-tourism-fire-danger-indicators:
     id: sis-tourism-fire-danger-indicators
+    cds_download_supported: false
     title: Fire danger indicators for Europe from 1970 to 2098 derived from climate projections
     description: The dataset presents projections of fire danger indicators for Europe based upon the
       Canadian Fire Weather Index System (FWI) under future climate conditions. The FWI is a meteorologically
@@ -6172,6 +6304,7 @@ datasets:
           for Europe derived from climate projections
   sis-tourism-snow-indicators:
     id: sis-tourism-snow-indicators
+    cds_download_supported: false
     title: Mountain tourism meteorological and snow indicators for Europe from 1950 to 2100 derived from
       reanalysis and climate projections
     description: This dataset provides meteorological and snow indicators for Europe, characterizing operating
@@ -6220,6 +6353,7 @@ datasets:
         title: Climate indicators for Europe from 1940 to 2100 derived from reanalysis and climate projections
   sis-water-level-change-indicators-cmip6:
     id: sis-water-level-change-indicators-cmip6
+    cds_download_supported: false
     title: Global sea level change indicators from 1950 to 2050 derived from reanalysis and high resolution
       CMIP6 climate projections
     description: This dataset provides statistical indicators of tides, storm surges and sea level that
@@ -6263,6 +6397,7 @@ datasets:
           resolution CMIP6 climate projections
   sis-water-level-change-timeseries-cmip6:
     id: sis-water-level-change-timeseries-cmip6
+    cds_download_supported: false
     title: Global sea level change time series from 1950 to 2050 derived from reanalysis and high resolution
       CMIP6 climate projections
     description: 'This dataset provides time series of global sea level related variables including tides,
