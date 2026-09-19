@@ -4,10 +4,18 @@ geobridge.modules.fuse
 
 Multi-service layer co-registration.
 
-Spatially and temporally co-registers two layers from any combination of
-C3S, CAMS, and CEMS, resolving grid resolution mismatches automatically.
-This module solves the burden of combining ERA5 (0.25°), CAMS (0.4°), and
-CEMS (1 km) data at a common grid for analysis.
+Spatially co-registers two layers from any combination of C3S, CAMS, and
+CEMS, resolving grid resolution mismatches automatically. This module solves
+the burden of combining ERA5 (0.25°), CAMS (0.4°), and CEMS (1 km) data at a
+common grid for analysis.
+
+Co-registration is spatial only. Time is not aligned: both layers must already
+describe the same period (for example by extracting both with the same
+``aggregation=``), otherwise bands that do not correspond are paired.
+
+The resampling kernel is chosen per layer from what the variable means and
+whether the grid is being coarsened or refined; see
+:mod:`geobridge.modules.resampling`.
 
 Requires the ``[zarr]`` optional dependencies for full functionality:
     pip install "geobridge[zarr]"
@@ -17,9 +25,11 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional, Union
+
+from geobridge.modules.resampling import resolve_method, to_rasterio
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +75,16 @@ class FusedLayer:
     metadata: dict = field(default_factory=dict)
 
     def correlation(self) -> float:
-        """Return the Pearson correlation coefficient between the two layers."""
+        """
+        Return the Pearson correlation coefficient between the two layers.
+
+        The coefficient is descriptive only. Neighbouring pixels are spatially
+        autocorrelated, so they are not independent samples and the effective
+        sample size is far smaller than the pixel count; any p-value or
+        confidence interval read off this r will overstate significance.
+        Pixels are also weighted equally rather than by area, which is
+        negligible over a city but not over a continental extent.
+        """
         _, np = _require_xarray()
         a = self.data[self.name_a].values.flatten()
         b = self.data[self.name_b].values.flatten()
@@ -156,7 +175,12 @@ def _common_target_grid(
     da_a, da_b, resolution_deg: float,
     bbox: Optional[tuple[float, float, float, float]] = None,
 ):
-    """Construct an xarray DataArray with the target grid coordinates."""
+    """
+    Construct an xarray DataArray with the target grid coordinates.
+
+    Latitudes run north to south (descending), matching the north-up GeoTIFF
+    convention, so the reprojected layers write out with a standard transform.
+    """
     xr, np = _require_xarray()
 
     if bbox is None:
@@ -179,7 +203,7 @@ def _common_target_grid(
         )
 
     lons = np.arange(west, east + resolution_deg / 2, resolution_deg)
-    lats = np.arange(south, north + resolution_deg / 2, resolution_deg)
+    lats = np.arange(north, south - resolution_deg / 2, -resolution_deg)
     target = xr.DataArray(
         np.zeros((len(lats), len(lons))),
         coords={"y": lats, "x": lons},
@@ -198,6 +222,24 @@ def _coord(da, name: str):
         if alias in da.coords:
             return da[alias]
     raise KeyError(f"No coordinate found for axis {name!r} in DataArray")
+
+
+def _semantic_hints(da, *names) -> list[str]:
+    """
+    Strings that may identify the variable in ``da``, most specific first.
+
+    GeoTIFFs written by geobridge carry the variable in the file stem and in
+    the per-band description (``long_name``); CDS-derived arrays may also carry
+    ``standard_name`` or a GRIB short name.
+    """
+    hints = [n for n in names if n]
+    for key in ("long_name", "standard_name", "GRIB_shortName", "GRIB_name"):
+        value = da.attrs.get(key)
+        if isinstance(value, (tuple, list)):
+            value = value[0] if value else None
+        if value:
+            hints.append(str(value))
+    return hints
 
 
 def _normalize_input(layer):
@@ -245,9 +287,15 @@ def fuse(
     bbox: Optional[tuple[float, float, float, float]] = None,
     name_a: Optional[str] = None,
     name_b: Optional[str] = None,
+    method: str = "auto",
+    method_a: Optional[str] = None,
+    method_b: Optional[str] = None,
 ) -> FusedLayer:
     """
     Spatially co-register two raster layers onto a common grid.
+
+    Only the spatial grid is aligned; both layers must already cover the same
+    time period.
 
     Parameters
     ----------
@@ -263,12 +311,37 @@ def fuse(
     name_a, name_b : str, optional
         Names for the two bands in the resulting Dataset. Default to
         ``layer_a.name`` / ``layer_b.name`` or 'layer_a' / 'layer_b'.
+    method : 'auto' | 'nearest' | 'bilinear' | 'cubic' | 'average' | 'mode' | 'max' | 'min' | 'med'
+        Resampling kernel applied to both layers. ``'auto'`` (default) picks
+        per layer from the variable's meaning, inferred from its name, and
+        from whether the grid is being coarsened or refined:
+
+        ===========  ==============  ==========
+        semantics    downsampling    upsampling
+        ===========  ==============  ==========
+        continuous   average         bilinear
+        categorical  mode            nearest
+        extrema      max (min)       nearest
+        ===========  ==============  ==========
+
+    method_a, method_b : str, optional
+        Per-layer override of ``method``.
 
     Returns
     -------
     FusedLayer
         Co-registered multi-band layer with .correlation(), .scatter_data(),
-        and .to_geotiff() methods.
+        and .to_geotiff() methods. The kernel used for each layer, and why,
+        is recorded in ``metadata["resampling"]``.
+
+    Notes
+    -----
+    ``average`` preserves the areal mean but not summed totals, so
+    precipitation and fluxes need conservative regridding (e.g. xESMF) if
+    totals must be preserved exactly. Semantics inference is a name heuristic
+    that defaults to continuous; an oddly named categorical layer needs
+    ``method_a='nearest'`` (or ``method_b``). Use
+    :func:`geobridge.modules.resampling.check_resampling` to audit a result.
 
     Examples
     --------
@@ -314,14 +387,27 @@ def fuse(
     target_res = _resolve_grid_resolution(da_a, da_b, resolution)
     target_grid = _common_target_grid(da_a, da_b, target_res, bbox)
 
-    # Reproject both onto the target grid using bilinear resampling
-    a_resampled = da_a.rio.reproject_match(target_grid, resampling=1)
-    b_resampled = da_b.rio.reproject_match(target_grid, resampling=1)
-
     n_a = name_a or default_name_a or "layer_a"
     n_b = name_b or default_name_b or "layer_b"
     if n_a == n_b:
         n_b = n_b + "_b"
+
+    # The kernel follows what the variable means and which way the grid moves
+    choice_a = resolve_method(
+        _semantic_hints(da_a, name_a, default_name_a),
+        _detect_resolution(da_a), target_res, method_a or method, label=n_a,
+    )
+    choice_b = resolve_method(
+        _semantic_hints(da_b, name_b, default_name_b),
+        _detect_resolution(da_b), target_res, method_b or method, label=n_b,
+    )
+    logger.debug("fuse resampling: %s -> %s, %s -> %s",
+                 n_a, choice_a.method, n_b, choice_b.method)
+
+    a_resampled = da_a.rio.reproject_match(
+        target_grid, resampling=to_rasterio(choice_a.method))
+    b_resampled = da_b.rio.reproject_match(
+        target_grid, resampling=to_rasterio(choice_b.method))
 
     fused_ds = xr.Dataset({n_a: a_resampled, n_b: b_resampled})
     if fused_ds.rio.crs is None:
@@ -337,5 +423,8 @@ def fuse(
         name_b=n_b,
         resolution_deg=target_res,
         bbox=final_bbox,
-        metadata={"resampling": "bilinear", "target_crs": "EPSG:4326"},
+        metadata={
+            "resampling": {n_a: asdict(choice_a), n_b: asdict(choice_b)},
+            "target_crs": "EPSG:4326",
+        },
     )
