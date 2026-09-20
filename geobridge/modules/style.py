@@ -89,11 +89,16 @@ _RAMPS: dict[str, list[tuple[float, int, int, int]]] = {
 # ---------------------------------------------------------------------------
 # Built-in variable presets
 # ---------------------------------------------------------------------------
+#
+# ``min``, ``max`` and the legend labels are in display units (``unit``).
+# ``scale`` and ``offset`` map the raster's stored values onto them:
+# ``display = raw * scale + offset``. ``anomaly_range`` is the optional
+# half-width of the anomaly ramp, in display units.
 
 _VARIABLE_PRESETS: dict[str, dict] = {
     "2m_temperature": {
-    "palette": "RdBu_r", "unit": "K", "min": 240, "max": 320,
-    "label": "Temperature (Kelvin)", "offset": 0,
+        "palette": "RdBu_r", "unit": "K", "min": 240, "max": 320,
+        "label": "Temperature (Kelvin)", "offset": 0, "anomaly_range": 10,
     },
     "total_precipitation": {
         "palette": "YlGnBu", "unit": "mm", "min": 0, "max": 50,
@@ -112,8 +117,8 @@ _VARIABLE_PRESETS: dict[str, dict] = {
         "label": "Ozone column", "offset": 0,
     },
     "utci": {
-    "palette": "RdYlBu_r", "unit": "K", "min": 233, "max": 320,
-    "label": "UTCI heat stress (Kelvin)", "offset": 0,
+        "palette": "RdYlBu_r", "unit": "K", "min": 233, "max": 320,
+        "label": "UTCI heat stress (Kelvin)", "offset": 0, "anomaly_range": 10,
     },
     "fire_radiative_power": {
         "palette": "hot_r", "unit": "MW", "min": 0, "max": 1000,
@@ -126,11 +131,15 @@ _VARIABLE_PRESETS: dict[str, dict] = {
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _preset_key(variable: str) -> str:
+    """Normalise a variable name to its preset lookup key."""
+    return variable.lower().replace("-", "_").replace(" ", "_")
+
+
 def _get_preset(variable: str) -> dict:
     """Return the preset for a variable, or a neutral default."""
-    key = variable.lower().replace("-", "_").replace(" ", "_")
     return _VARIABLE_PRESETS.get(
-        key,
+        _preset_key(variable),
         {"palette": "viridis", "unit": "", "min": 0, "max": 1,
          "label": variable, "offset": 0},
     )
@@ -140,10 +149,14 @@ def _adjust_for_style_type(preset: dict, style_type: str) -> dict:
     """Adjust min/max/palette for anomaly or percentile styles."""
     p = dict(preset)
     if style_type == "anomaly":
-        # Symmetric range around zero
-        magnitude = max(abs(p["min"]), abs(p["max"])) / 4
+        # Symmetric range around zero. Base the default on the width of the
+        # range, not its largest absolute value, so a Kelvin offset does not
+        # inflate it (240-320 K would otherwise give +/-80 K).
+        magnitude = p.get("anomaly_range", (p["max"] - p["min"]) / 4)
         p["min"] = -magnitude
         p["max"] = magnitude
+        # An anomaly is a difference, so an additive offset does not apply
+        p["offset"] = 0
         p["label"] = f"{p['label']} anomaly"
         # Force a diverging palette
         if p["palette"] not in ("RdBu_r", "PuOr", "RdYlBu_r"):
@@ -152,6 +165,9 @@ def _adjust_for_style_type(preset: dict, style_type: str) -> dict:
         p["min"] = 0
         p["max"] = 100
         p["unit"] = "percentile"
+        # A percentile raster already stores 0-100, whatever the variable's units
+        p["scale"] = 1
+        p["offset"] = 0
         p["label"] = f"{p['label']} percentile"
     return p
 
@@ -194,6 +210,16 @@ def _build_qml(preset: dict, n_stops: int = 11) -> str:
     label = preset["label"]
     unit = preset["unit"]
     palette = preset["palette"]
+    scale = float(preset.get("scale", 1))
+    offset = float(preset.get("offset", 0))
+    if scale <= 0:
+        raise ValueError(f"scale must be positive; got {scale!r}")
+
+    def to_raw(display: float) -> float:
+        # min/max and labels are in display units but the raster stores raw
+        # values, so stops must be placed at the raw value they stand for.
+        # 12 significant digits drops float noise (0.30000000000000004).
+        return float(f"{(display - offset) / scale:.12g}")
 
     stops = _interpolate_colour_stops(palette, vmin, vmax, n_stops)
 
@@ -208,8 +234,8 @@ def _build_qml(preset: dict, n_stops: int = 11) -> str:
         attrib={
             "type": "singlebandpseudocolor",
             "band": "1",
-            "classificationMin": str(vmin),
-            "classificationMax": str(vmax),
+            "classificationMin": str(to_raw(vmin)),
+            "classificationMax": str(to_raw(vmax)),
             "opacity": "1",
         },
     )
@@ -224,7 +250,7 @@ def _build_qml(preset: dict, n_stops: int = 11) -> str:
         ET.SubElement(
             colorrampshader, "item",
             attrib={
-                "value": f"{value:g}",
+                "value": f"{to_raw(value):g}",
                 "color": colour_hex,
                 "alpha": "255",
                 "label": f"{value:g} {unit}".strip(),
@@ -276,7 +302,11 @@ def to_qgis_style(
     output_path : path-like, optional
         Where to save the .qml file. Defaults to ``./{variable}.qml``.
     overrides : dict, optional
-        Override preset values, e.g. {"min": -10, "max": 40}.
+        Override preset values, e.g. {"min": -10, "max": 40}. ``min`` and
+        ``max`` are in display units (the preset's ``unit``); ``scale`` and
+        ``offset`` (``display = raw * scale + offset``) map them onto the
+        values stored in the raster. Variables without a built-in preset
+        fall back to a 0-1 range, so pass ``min`` and ``max`` for those.
 
     Returns
     -------
@@ -302,6 +332,20 @@ def to_qgis_style(
     preset = _adjust_for_style_type(_get_preset(variable), style_type)
     if overrides:
         preset.update(overrides)
+
+    # Percentile ramps are 0-100 for every variable, so only the others need
+    # a calibrated range.
+    if (
+        style_type != "percentile"
+        and _preset_key(variable) not in _VARIABLE_PRESETS
+        and not {"min", "max"} <= set(overrides or {})
+    ):
+        logger.warning(
+            "No built-in style preset for %r; the ramp spans a default range "
+            "of %g to %g. Pass overrides={'min': ..., 'max': ..., 'unit': ...} "
+            "to calibrate it.",
+            variable, preset["min"], preset["max"],
+        )
 
     qml_xml = _build_qml(preset)
 
