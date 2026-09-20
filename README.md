@@ -45,8 +45,11 @@ The library is the foundation for the project's QGIS plugin.
   constraints before you submit it.
 - **Styling.** `gb.to_qgis_style()` generate
   calibrated colour ramps for known Copernicus variables.
-- **Fusion.** `gb.fuse()` co-registers multiple layers onto a common grid
-  for joint analysis (e.g. heat + air quality).
+- **Fusion.** `gb.fuse()` co-registers two layers onto a common grid
+  for joint analysis (e.g. heat + air quality). The resampling kernel is
+  picked per layer from what the variable means and whether the grid is
+  being coarsened or refined (`average` for continuous fields, `mode` for
+  categorical masks, `max` for extrema), and can be overridden with `method=`.
 - **Semantics.** `gb.semantic_search()` resolves user themes like
   "urban heat island" or "wildfire risk" into concrete dataset and
   workflow recommendations. `gb.semantic_resources()` returns the matching
@@ -163,7 +166,8 @@ geobridge/                              ← repository root
 │   │   ├── form.py                     ← dataset form schema & constraints
 │   │   ├── style.py                    ← QGIS QML export
 │   │   ├── timeseries.py               ← point value / time series (WMTS & Zarr)
-│   │   └── fuse.py                     ← multi-layer co-registration
+│   │   ├── fuse.py                     ← two-layer co-registration
+│   │   └── resampling.py               ← semantics-aware resampling kernels for fuse()
 │   └── semantic/
 │       ├── engine.py                   ← rule-based query resolver
 │       ├── vocabulary.yaml             ← themes and use cases
@@ -188,6 +192,8 @@ geobridge/                              ← repository root
         ├── test_style.py
         ├── test_semantic.py
         ├── test_catalog.py
+        ├── test_fuse.py
+        ├── test_resampling.py
         └── test_wmts.py
 ```
 
